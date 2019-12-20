@@ -1,2 +1,7 @@
-# ForestManagement
-PowerShell module to manage forest level Active Directory resources
+﻿# DCManagement
+
+## Synopsis
+
+Module to manage Forest level Active Directory content & configuration
+
+> More description to come

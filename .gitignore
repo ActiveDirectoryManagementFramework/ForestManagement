@@ -1,0 +1,22 @@
+﻿
+# ignore the settings folder and files for VSCode and PSS
+# .vscode/*
+*.psproj
+*TempPoint*
+
+# Ignore staging info from Visual Studio
+library/ForestManagement/.vs/*
+library/ForestManagement/ForestManagement/bin/*
+library/ForestManagement/ForestManagement/obj/*
+
+# ignore PowerShell Studio MetaData
+ForestManagement/ForestManagement.psproj
+ForestManagement/ForestManagement.psproj.bak
+ForestManagement/ForestManagement.psprojs
+ForestManagement/ForestManagement.psproj
+
+# ignore the TestResults
+TestResults/*
+
+# ignore the publishing Directory
+publish/*

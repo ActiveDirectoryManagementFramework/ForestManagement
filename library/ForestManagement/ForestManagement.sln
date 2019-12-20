@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{0A02316E-5BC0-43DB-B0B0-296DFDED5008}") = "ForestManagement", "ForestManagement\ForestManagement.csproj", "{9345679A-FE74-41DD-901F-95763C5256C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9345679A-FE74-41DD-901F-95763C5256C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9345679A-FE74-41DD-901F-95763C5256C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9345679A-FE74-41DD-901F-95763C5256C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9345679A-FE74-41DD-901F-95763C5256C9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {26A2ABE3-1C13-4134-8E70-1845F9A93AF0}
+	EndGlobalSection
+EndGlobal
