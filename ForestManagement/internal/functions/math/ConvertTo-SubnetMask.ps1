@@ -15,18 +15,19 @@
 
 			Converts the size (30) into the mask as IPAddress
 	#>
-	
+	[OutputType([IPAddress])]
 	[CmdletBinding()]
-	Param (
-		[ValidateRange(1,32)]
+	param (
+		[ValidateRange(1, 32)]
 		[int]
 		$MaskSize
 	)
 	
 	process
 	{
-		$binaryString = ("1") * $MaskSize + ("0") * (32-$MaskSize)
-		$bytes = foreach ($number in (0..3)) {
+		$binaryString = ("1") * $MaskSize + ("0") * (32 - $MaskSize)
+		$bytes = foreach ($number in (0 .. 3))
+		{
 			[convert]::ToByte($binaryString.SubString(($number * 8), 8), 2)
 		}
 		[IPAddress]::new($bytes)

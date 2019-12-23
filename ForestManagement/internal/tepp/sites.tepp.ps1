@@ -1,4 +1,4 @@
-Register-PSFTeppScriptblock -Name "ForestManagement.Sites" -ScriptBlock {
+﻿Register-PSFTeppScriptblock -Name "ForestManagement.Sites" -ScriptBlock {
     $module = Get-Module ForestManagement
     & $module { $script:sites.Keys }
 }

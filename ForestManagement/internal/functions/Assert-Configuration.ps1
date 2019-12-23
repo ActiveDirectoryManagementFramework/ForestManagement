@@ -12,6 +12,10 @@
 	.PARAMETER Type
 		The setting type to assert.
 	
+	.PARAMETER Cmdlet
+		The $PSCmdlet variable of the calling command.
+		Used to terminate said calling command if relevant settings are missing
+	
 	.EXAMPLE
 		PS C:\> Assert-Configuration -Type Users
 
