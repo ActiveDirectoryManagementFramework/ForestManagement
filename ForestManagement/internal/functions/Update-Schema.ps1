@@ -19,7 +19,8 @@
 
         Forces a schema update on dc1.contoso.com
     #>
-    [CmdletBinding()]
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
+	[CmdletBinding()]
     param (
         [string]
         $Server,

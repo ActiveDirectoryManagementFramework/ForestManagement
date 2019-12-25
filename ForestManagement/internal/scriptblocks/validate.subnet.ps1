@@ -1,4 +1,4 @@
-Set-PSFScriptblock -Name 'ForestManagement.Validate.Subnet' -Scriptblock {
+﻿Set-PSFScriptblock -Name 'ForestManagement.Validate.Subnet' -Scriptblock {
     if (-not $_.Contains("/")) { return $false }
     if (($_ -split "/").Count -gt 2) { return $false }
     

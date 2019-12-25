@@ -32,11 +32,11 @@
 	process
 	{
 		foreach ($diffSiteLink in $DifferenceSiteLink) {
-			if (($diffSiteLink.Site1 -eq $ReferenceSiteLink.Site1) -and ($diffSiteLink.Site2 -eq $ReferenceSiteLink.Site2)) { 
+			if (($diffSiteLink.Site1 -eq $ReferenceSiteLink.Site1) -and ($diffSiteLink.Site2 -eq $ReferenceSiteLink.Site2)) {
 				$diffSiteLink
 				continue
 			}
-			if (($diffSiteLink.Site1 -eq $ReferenceSiteLink.Site2) -and ($diffSiteLink.Site2 -eq $ReferenceSiteLink.Site1)) { 
+			if (($diffSiteLink.Site1 -eq $ReferenceSiteLink.Site2) -and ($diffSiteLink.Site2 -eq $ReferenceSiteLink.Site1)) {
 				$diffSiteLink
 				continue
 			}

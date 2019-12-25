@@ -25,10 +25,11 @@
 
 		Returns the attributes hashtable for attributes to update.
 	#>
+	[OutputType([hashtable])]
 	[CmdletBinding()]
-	Param (
+	param (
 		$Configuration,
-
+		
 		$ADObject
 	)
 	
@@ -48,13 +49,16 @@
 			showInAdvancedViewOnly = $Configuration.AdvancedView
 		}
 		#endregion Build out basic attribute hashtable
-
+		
 		#region If ADObject is present: Remove attributes that are already present
 		$attributeNames = 'isSingleValued', 'searchflags', 'isMemberOfPartialAttributeSet', 'oMSyntax', 'attributeId', 'adminDescription', 'adminDisplayName', 'showInAdvancedViewOnly', 'lDAPDisplayName', 'attributeSyntax'
-
-		if ($ADObject) {
-			foreach ($attributeName in $attributeNames) {
-				if ($ADobject.$attributeName -eq $attributes[$attributeName]) {
+		
+		if ($ADObject)
+		{
+			foreach ($attributeName in $attributeNames)
+			{
+				if ($ADobject.$attributeName -eq $attributes[$attributeName])
+				{
 					$attributes.Remove($attributeName)
 				}
 			}

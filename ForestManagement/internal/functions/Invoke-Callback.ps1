@@ -25,6 +25,7 @@
 
 		Executes all callbacks against the specified server using the specified credentials.
 	#>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingEmptyCatchBlock", "")]
 	[CmdletBinding()]
 	Param (
 		[string]

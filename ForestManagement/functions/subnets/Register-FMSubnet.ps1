@@ -27,7 +27,7 @@
 			PS C:\> Register-FMSubnet -SiteName MySite -Name '1.2.3.4/32'
 
 			Assigns the subnet '1.2.3.4/32' to the site 'MySite'
-	#>	
+	#>
 	[CmdletBinding()]
 	Param (
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]

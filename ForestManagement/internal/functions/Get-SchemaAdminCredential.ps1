@@ -20,6 +20,8 @@
 
 		Returns the configured schema credentials
 	#>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignments", "")]
+	[OutputType([PSCredential])]
 	[CmdletBinding()]
 	Param (
 		[PSFComputer]

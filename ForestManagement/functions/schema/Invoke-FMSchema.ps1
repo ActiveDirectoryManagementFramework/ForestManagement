@@ -85,7 +85,7 @@
 				#region Create new Schema Attribute
 				'ConfigurationOnly' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Creating.Attribute' -Target $testItem.Identity -ScriptBlock {
-						$adObject = New-ADObject @parameters -Type attributeSchema -Name $testItem.Configuration.AdminDisplayName -Path $rootDSE.schemaNamingContext -OtherAttributes (Resolve-SchemaAttribute -Configuration $testItem.Configuration) -PassThru -ErrorAction Stop
+						New-ADObject @parameters -Type attributeSchema -Name $testItem.Configuration.AdminDisplayName -Path $rootDSE.schemaNamingContext -OtherAttributes (Resolve-SchemaAttribute -Configuration $testItem.Configuration) -ErrorAction Stop
 						Update-Schema @parameters
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet -Continue
 					

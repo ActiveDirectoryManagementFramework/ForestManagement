@@ -1,4 +1,4 @@
-# Site Configurations
+﻿# Site Configurations
 $script:sites = @{ }
 
 # Subnet Configurations
