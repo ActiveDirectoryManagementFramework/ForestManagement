@@ -4,4 +4,4 @@
 
 Module to manage Forest level Active Directory content & configuration
 
-> More description to come
+For full documentation, see [the project website](https://admf.one)
