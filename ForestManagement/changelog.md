@@ -1,5 +1,9 @@
 ﻿# Changelog
-## 1.0.0 (2019-08-05)
- - New: Some Stuff
- - Upd: Moar Stuff
- - Fix: Much Stuff
+
+## 1.0.6 (2020-01-27)
+
+- Metadata update
+
+## 1.0.5 (2019-12-21)
+
+- Initial Release
