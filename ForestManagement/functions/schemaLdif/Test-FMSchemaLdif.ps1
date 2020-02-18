@@ -54,176 +54,125 @@
 	}
 	process
 	{
-		foreach ($schemaFile in (Get-FMSchemaLdif)) {
-			$countDelta = 0
-			$changes = @()
+		$ldifMapping = ConvertTo-SchemaLdifPhase -LdifData (Get-FMSchemaLdif)
+		$ldifSorted = Get-FMSchemaLdif | Sort-Object Weight
+		$changes = @{ }
+		$missingEntities = @()
 
-			:setting foreach ($setting in $schemaFile.Settings) {
-				if (-not $setting.DistinguishedName) { continue }
-				$attributeName = '{0},{1}' -f $setting.DistinguishedName, $rootDSE.schemaNamingContext
+		foreach ($ldifFile in $ldifSorted) {
+			$changes[$ldifFile.Name] = @()
+		}
 
-				#region Calculate deltas
-				try { $adObject = Get-ADObject @parameters -Identity $attributeName -ErrorAction Stop -Properties * }
-				catch {
-					$countDelta++
-					$changes += [PSCustomObject]@{
-						LdifName = $schemaFile.Name
-						LdifPath = $schemaFile.Path
-						Type = 'Missing'
-						Object  = $attributeName
-						Properties = @()
+		foreach ($distinguishedName in $ldifMapping.Keys) {
+			$hasDefinedState = $ldifMapping[$distinguishedName].Values.State.Count -gt 0
+			$attributeName = '{0},{1}' -f $distinguishedName, $rootDSE.schemaNamingContext
+
+			#region Retrieve AD Object ($adObject)
+			try { $adObject = Get-ADObject @parameters -Identity $attributeName -ErrorAction Stop -Properties * }
+			catch {
+				if ($hasDefinedState) {
+					foreach ($file in $ldifMapping[$distinguishedName].Keys) {
+						$changes[$file] += [PSCustomObject]@{
+								DN = $distinguishedName
+								Property = '<FailsToExist>'
+								File = $file
+								Setting = $ldifMapping[$distinguishedName][$file]
+								ADObject = $null
+								ValueS = $null
+								ValueA = $null
+							}
 					}
-					continue
 				}
-
-				switch ($setting.changetype)
-				{
-					#region New Item Definitions
-					'add'
-					{
-						$change = [PSCustomObject]@{
-							LdifName = $schemaFile.Name
-							LdifPath = $schemaFile.Path
-							Type = 'InEqual'
-							Object  = $attributeName
-							Properties = @()
-						}
-						:prop foreach ($property in $setting.PSObject.Properties.Name) {
-							switch ($property) {
-								'DistinguishedName' { continue prop }
-								'changetype' { continue prop }
-								'schemaIDGUID' {
-									if (($setting.$property.GuidData -join '|') -ne ($adObject.$property -join '|')) {
-										$countDelta++
-										$change.Properties += $property
-									}
-								}
-								'attributeSecurityGUID' {
-									if (($setting.$property.GuidData -join '|') -ne ($adObject.$property -join '|')) {
-										$countDelta++
-										$change.Properties += $property
-									}
-								}
-								'objectCategory' {
-									if (($setting.$property -replace '<SchemaContainerDN>',$rootDSE.schemaNamingContext) -ne ($adObject.$property -join '|')) {
-										$countDelta++
-										$change.Properties += $property
-									}
-								}
-								default {
-									foreach ($item in $setting.$property) {
-										if ($item -notin $adObject.$property) {
-											$countDelta++
-											$change.Properties += $property
-											continue prop
-										}
-									}
-								}
-							}
-						}
-						if ($change.Properties.Count -gt 0) {
-							$changes += $change
-						}
+				else {
+					if ($distinguishedName -notin ($ldifSorted.MissingObjectExemption | Write-Output)) {
+						Write-PSFMessage -Level Warning -String 'Test-FMSchemaLdif.Missing.SchemaItem' -StringValues $attributeName -Tag 'panic'
+						$missingEntities += $attributeName
 					}
-					#endregion New Item Definitions
-
-					#region Deltas
-					'modify'
-					{
-						if ($setting.Add) {
-							$propName = $setting.Add
-							if ($setting.$propName | Where-Object { $_ -notin $adObject.$propName }) {
-								$countDelta++
-								$changes += [PSCustomObject]@{
-									LdifName = $schemaFile.Name
-									LdifPath = $schemaFile.Path
-									Type = 'Missing'
-									Object  = $attributeName
-									Properties = @($propName)
-								}
-								continue setting
-							}
-						}
-						elseif ($setting.Replace) {
-							$propName = $setting.Replace
-							if ($setting.$propName -ne $adObject.$propName) {
-								$countDelta++
-								$changes += [PSCustomObject]@{
-									LdifName = $schemaFile.Name
-									LdifPath = $schemaFile.Path
-									Type = 'InEqual'
-									Object  = $attributeName
-									Properties = @($propName)
-								}
-								continue setting
-							}
-						}
-						else {
-							$change = [PSCustomObject]@{
-								LdifName = $schemaFile.Name
-								LdifPath = $schemaFile.Path
-								Type = 'InEqual'
-								Object  = $attributeName
-								Properties = @()
-							}
-							:prop foreach ($property in $setting.PSObject.Properties.Name) {
-								switch ($property) {
-									'DistinguishedName' { continue prop }
-									'changetype' { continue prop }
-									'schemaIDGUID' {
-										if (($setting.$property.GuidData -join '|') -ne ($adObject.$property -join '|')) {
-											$countDelta++
-											$change.Properties += $property
-										}
-									}
-									'attributeSecurityGUID' {
-										if (($setting.$property.GuidData -join '|') -ne ($adObject.$property -join '|')) {
-											$countDelta++
-											$change.Properties += $property
-										}
-									}
-									'objectCategory' {
-										if (($setting.$property -replace '<SchemaContainerDN>',$rootDSE.schemaNamingContext) -ne ($adObject.$property -join '|')) {
-											$countDelta++
-											$change.Properties += $property
-										}
-									}
-									default {
-										foreach ($item in $setting.$property) {
-											if ($item -notin $adObject.$property) {
-												$countDelta++
-												$change.Properties += $property
-												continue prop
-											}
-										}
-									}
-								}
-							}
-							if ($change.Properties.Count -gt 0) {
-								$changes += $change
-							}
-						}
-					}
-					#endregion Deltas
 				}
-				#endregion Calculate deltas
-
-
+				continue
 			}
+			#endregion Retrieve AD Object ($adObject)
 
-			if ($countDelta -gt 0) {
-				[PSCustomObject]@{
-					PSTypeName = 'ForestManagement.SchemaLdif.TestResult'
-					Type = 'InEqual'
-					ObjectType = 'SchemaLdif'
-					Identity = $schemaFile.Name
-					Changed = ($changes.Object | Select-Object -Unique)
-					Server = $forest.SchemaMaster
-					DeltaCount = $countDelta
-					Changes = $changes
-					ADObject = $null
-					Configuration = $schemaFile
+			#region Compare configured with real state ($offStateLdifName)
+			$offStateLdif = foreach ($ldifFile in $ldifSorted) {
+				# Skip files that do not yet contain the taret object
+				if (-not $ldifMapping[$distinguishedName][$ldifFile.Name]) { continue }
+
+				$definedState = $ldifMapping[$distinguishedName][$ldifFile.Name]
+				if ($definedState.State.Count -gt 0) {
+					foreach ($propertyName in $definedState.State.Keys) {
+						if (Compare-SchemaProperty -Setting $definedState.State -ADObject $adObject -PropertyName $propertyName -RootDSE $rootDSE) {
+							[PSCustomObject]@{
+								DN = $distinguishedName
+								Property = $propertyName
+								File = $ldifFile.Name
+								Setting = $definedState
+								ADObject = $adObject
+								ValueS = $definedState.State.$propertyName
+								ValueA = $adObject.$propertyName
+							}
+						}
+					}
 				}
+				else {
+					foreach ($propertyName in $definedState.Add.Keys) {
+						if (Compare-SchemaProperty -Setting $definedState.Add -ADObject $adObject -PropertyName $propertyName -RootDSE $rootDSE -Add) {
+							[PSCustomObject]@{
+								DN = $distinguishedName
+								Property = $propertyName
+								File = $ldifFile.Name
+								Setting = $definedState
+								ADObject = $adObject
+								ValueS = $definedState.Add.$propertyName
+								ValueA = $adObject.$propertyName
+							}
+						}
+					}
+					foreach ($propertyName in $definedState.Replace.Keys) {
+						if (Compare-SchemaProperty -Setting $definedState.Replace -ADObject $adObject -PropertyName $propertyName -RootDSE $rootDSE) {
+							[PSCustomObject]@{
+								DN = $distinguishedName
+								Property = $propertyName
+								File = $ldifFile.Name
+								Setting = $definedState
+								ADObject = $adObject
+								ValueS = $definedState.Replace.$propertyName
+								ValueA = $adObject.$propertyName
+							}
+						}
+					}
+				}
+			}
+			#endregion Compare configured with real state ($offStateLdifName)
+
+			$applicableLdif = $ldifSorted | Where-Object Name -in $ldifMapping[$distinguishedName].Keys
+			$lastAppliedItem = $applicableLdif |
+				Where-Object Name -notin $offStateLdif.File |
+					Sort-Object Weight -Descending |
+						Select-Object -First 1
+			
+			foreach ($ldifFile in $applicableLdif) {
+				if ($ldifFile.Weight -lt $lastAppliedItem.Weight) { continue }
+				if ($lastAppliedItem.Name -eq $ldifFile.Name) { continue }
+				foreach ($entry in $offStateLdif) {
+					if ($entry.File -ne $ldifFile.Name) { continue }
+					$changes[$ldifFile.Name] += $entry
+				}
+			}
+		}
+		foreach ($schemaName in $changes.Keys) {
+			if (-not $changes[$schemaName]) { continue }
+
+			[PSCustomObject]@{
+				PSTypeName = 'ForestManagement.SchemaLdif.TestResult'
+				Type = 'InEqual'
+				ObjectType = 'SchemaLdif'
+				Identity = $schemaName
+				Changed = $changes[$schemaName]
+				Server = $forest.SchemaMaster
+				DeltaCount = $changes[$schemaName].Count
+				ADObject = $null
+				Configuration = ($ldifSorted | Where-Object Name -eq $schemaName)
 			}
 		}
 	}

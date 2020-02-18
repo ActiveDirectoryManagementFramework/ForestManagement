@@ -79,7 +79,14 @@
 	{
 		Invoke-PSFProtectedCommand -ActionString 'Invoke-LdifFile.Invoking.File' -ActionStringValues $Path -ScriptBlock {
 			$procInfo = Start-Process -FilePath ldifde.exe -ArgumentList $arguments -Wait -PassThru -ErrorAction Stop -WindowStyle Hidden
-			if ($procInfo.ExitCode) { throw (New-Object ComponentModel.Win32Exception($procInfo.ExitCode)) }
+			if ($procInfo.ExitCode) {
+				$winError = [System.ComponentModel.Win32Exception]::new($procInfo.ExitCode)
+				switch ($procInfo.ExitCode) {
+					8224 { $outerError = [System.InvalidOperationException]::new("Failed to apply ldif file. Validate domain health, especially FSMO assignment and replication health. $($winError.Message)", $winError) }
+					default { $outerError = [System.InvalidOperationException]::new("Failed to apply ldif file: $($winError.Message)", $winError) }
+				}
+				throw $outerError
+			}
 		} -EnableException $true -Target $Server -PSCmdlet $PSCmdlet
 	}
 }

@@ -88,6 +88,7 @@
 		$lines = Get-Content -Path $Path
 		$currentObject = @{ }
 		$lastKey = ''
+		$orderCount = 0
 	}
 	process
 	{
@@ -102,7 +103,9 @@
 				$currentObject = @{
 					PSTypeName	      = 'ForestManagement.Schema.Ldif.Setting'
 					DistinguishedName = ($line -replace '^dn:', '').Trim() -replace ',DC=X$' -replace ',CN=Schema,CN=Configuration$'
+					FM_OrderCount     = $orderCount
 				}
+				$orderCount++
 				$lastKey = 'DistinguishedName'
 				continue
 			}
