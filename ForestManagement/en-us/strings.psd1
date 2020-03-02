@@ -63,6 +63,7 @@
 	'Test-FMSchema.Connect.Failed' = 'Failed to connect to {0}' # $Server
 	'Test-FMSchema.ReadOnly.Delta' = 'There is a discrepancy in the Read-Only property {0}: Found {1} when it should be {2}' # 'LdapDisplayName', $schemaObject.lDAPDisplayName, $schemaSetting.LdapDisplayName
 	'Test-FMSchemaLdif.Connect.Failed' = 'Failed to connect to {0}' # $Server
+	'Test-FMSchemaLdif.Missing.SchemaItem' = 'Defining changes for {0} when object has not been defined and does not exist!' # $attributeName
 	'Test-FMServer.SiteConflict' = 'Found a site conflict on DC {0} : Is in site {2} and could also be in {1} ({3})' # $domainController.Name, $foundSubnet.SiteName, $domainController.SiteName, $foundSubnet.Name
 
 	'Test-FMSiteLink.Critical.TooManySites' = 'Critical issue when scanning sitelinks: The following link contains more than two sites ({1}): "{0}". This is not a technical error, but violates configuration policies. Manually update this sitelink-settings in AD to resolve the issue.' # $siteLink.DistinguishedName, $siteLink.siteList.Count
