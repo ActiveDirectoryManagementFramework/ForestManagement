@@ -87,6 +87,37 @@
             </TableControl>
         </View>
 
+        <!-- ForestManagement.SchemaLdif.Configuration -->
+        <View>
+            <Name>ForestManagement.SchemaLdif.Configuration</Name>
+            <ViewSelectedBy>
+                <TypeName>ForestManagement.SchemaLdif.Configuration</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <AutoSize/>
+                <TableHeaders>
+                    <TableColumnHeader/>
+                    <TableColumnHeader/>
+                    <TableColumnHeader/>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Name</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Weight</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>ContextName</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+
         <!-- ForestManagement.SiteLink.Configuration -->
         <View>
             <Name>ForestManagement.SiteLink.Configuration</Name>
