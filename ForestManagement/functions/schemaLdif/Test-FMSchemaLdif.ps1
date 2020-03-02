@@ -160,7 +160,7 @@
 				}
 			}
 		}
-		foreach ($schemaName in $changes.Keys) {
+		$ldifResult = foreach ($schemaName in $changes.Keys) {
 			if (-not $changes[$schemaName]) { continue }
 
 			[PSCustomObject]@{
@@ -175,5 +175,6 @@
 				Configuration = ($ldifSorted | Where-Object Name -eq $schemaName)
 			}
 		}
+		$ldifResult | Sort-Object { $_.Configuration.Weight }
 	}
 }

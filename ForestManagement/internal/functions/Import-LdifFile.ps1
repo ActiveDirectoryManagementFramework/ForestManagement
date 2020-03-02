@@ -71,6 +71,9 @@
 							GuidData = [System.Convert]::FromBase64String($Value)
 						}
 					}
+					'omObjectClass' {
+						[System.Convert]::FromBase64String($Value)
+					}
 					default { [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Value)) }
 				}
 			}

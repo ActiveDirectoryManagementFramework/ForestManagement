@@ -60,22 +60,22 @@
         }
         'Description' {
             # Prevent encoding errors / issues from falsifying the results
-            if (($null -eq $Setting.$PropertyName) -and ($null -eq $ADObject.$PropertyName)) { return $false }
+            if (($null -eq $Setting.$PropertyName) -and ($null -eq ($ADObject.$PropertyName | Select-Object -Unique))) { return $false }
             if ($null -eq $Setting.$PropertyName) { return $true }
-            if ($null -eq $ADObject.$PropertyName) { return $true }
+            if ($null -eq ($ADObject.$PropertyName | Select-Object -Unique)) { return $true }
             return (($Setting.$PropertyName -replace "[^\d\w]","_") -ne ($ADObject.$PropertyName -replace "[^\d\w]","_"))
         }
         'mayContain' {
-            if (($null -eq $Setting.$PropertyName) -and ($null -eq $ADObject.$PropertyName)) { return $false }
+            if (($null -eq $Setting.$PropertyName) -and ($null -eq ($ADObject.$PropertyName | Select-Object -Unique))) { return $false }
             if ($null -eq $Setting.$PropertyName) { return $true }
-            if ($null -eq $ADObject.$PropertyName) { return $true }
-            return [bool](Compare-Object $Setting.$PropertyName $ADObject.$PropertyName | Where-Object SideIndicator -eq '<=')
+            if ($null -eq ($ADObject.$PropertyName | Select-Object -Unique)) { return $true }
+            return [bool](Compare-Object ($Setting.$PropertyName | Select-Object -Unique) ($ADObject.$PropertyName | Select-Object -Unique) | Where-Object SideIndicator -eq '<=')
         }
         default {
-            if (($null -eq $Setting.$PropertyName) -and ($null -eq $ADObject.$PropertyName)) { return $false }
+            if (($null -eq $Setting.$PropertyName) -and ($null -eq ($ADObject.$PropertyName | Select-Object -Unique))) { return $false }
             if ($null -eq $Setting.$PropertyName) { return $true }
-            if ($null -eq $ADObject.$PropertyName) { return $true }
-            if ($Add) { return [bool](Compare-Object $Setting.$PropertyName $ADObject.$PropertyName | Where-Object SideIndicator -eq '<=') }
+            if ($null -eq ($ADObject.$PropertyName | Select-Object -Unique)) { return $true }
+            if ($Add) { return [bool](Compare-Object ($Setting.$PropertyName | Select-Object -Unique) ($ADObject.$PropertyName | Select-Object -Unique) | Where-Object SideIndicator -eq '<=') }
             return [bool](Compare-Object $Setting.$PropertyName $ADObject.$PropertyName)
         }
     }
