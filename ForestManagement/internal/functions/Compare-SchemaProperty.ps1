@@ -29,7 +29,8 @@
         PS C:\> Compare-SchemaProperty -Setting $setting -ADObject $adObject -PropertyName attributeSecurityGUID -RootDSE $rootDSE
 
         Returns, whether the values found in $setting and $adObject are different from each other.
-    #>
+	#>
+	[OutputType([System.Boolean])]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]

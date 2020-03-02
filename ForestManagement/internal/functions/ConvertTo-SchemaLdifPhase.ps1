@@ -16,7 +16,8 @@
         PS C:\> $ldifPhases = ConvertTo-SchemaLdifPhase -LdifData (Get-FMSchemaLdif)
 
         Returns the hashtable containing the different phases of all registered ldif files.
-    #>
+	#>
+	[OutputType([Hashtable])]
     [CmdletBinding()]
     param (
         $LdifData
@@ -150,6 +151,7 @@
     }
 
     function Remove-NoOp {
+		[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
         [CmdletBinding()]
         param (
             $LdifData,
