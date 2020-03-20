@@ -1,28 +1,28 @@
 ﻿function Register-FMNTAuthStore {
 	<#
 		.SYNOPSIS
-		Regisgter NTAuthStore certificates
+			Register NTAuthStore certificates
 		
 		.DESCRIPTION
-		Regisgter NTAuthStore certificates
-		This is the ideal / desired state for the NTAuthStore certificate configuration.
-		Forests will be brought into this state by using Invoke-FMNTAuthStore.
+			Register NTAuthStore certificates
+			This is the ideal / desired state for the NTAuthStore certificate configuration.
+			Forests will be brought into this state by using Invoke-FMNTAuthStore.
 		
 		.PARAMETER Certificate
-		The certifcate to apply.
+			The certifcate to apply.
 		
 		.PARAMETER Authorative
-		Should the NTAuthStore configuration overwrite the existing configuration, rather than adding to it (default).
+			Should the NTAuthStore configuration overwrite the existing configuration, rather than adding to it (default).
 
 		.EXAMPLE
-		Register-FMNTAuthStore -Certificate $NTAuthStoreCertificate
+			PS C:\> Register-FMNTAuthStore -Certificate $NTAuthStoreCertificate
 
-		Register a certiciate.
+			Register a certiciate.
 		
 		.EXAMPLE
-		Register-FMNTAuthStore -Authorative
-		
-		Register the autorative state.
+			PS C:\> Register-FMNTAuthStore -Authorative
+			
+			Sets our current configuration as authorative, removing all non-listed certificates from the store.
 	#>
 	[CmdletBinding()]
 	Param (
