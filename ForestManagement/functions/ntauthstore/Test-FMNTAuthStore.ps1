@@ -81,7 +81,7 @@
 		$storeObject = $null
 		$storedCertificates = $null
 		try {
-			$storeObject = Get-ADObject -Identity "CN=NTAuthCertificates,CN=Public Key Services,CN=Services,$($rootDSE.configurationNamingContext)" -ErrorAction Stop -Properties cACertificate
+			$storeObject = Get-ADObject @parameters -Identity "CN=NTAuthCertificates,CN=Public Key Services,CN=Services,$($rootDSE.configurationNamingContext)" -ErrorAction Stop -Properties cACertificate
 			$storedCertificates = $storeObject.cACertificate | ForEach-Object {
 				[System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_)
 			}
@@ -92,31 +92,32 @@
 		}
 	}
 	process {
+		$resDefault = @{
+			Server = $Server
+		}
 		$configuredCertificates = Get-FMNTAuthStore
 		foreach ($configuredCertificate in $configuredCertificates) {
-			$resDefault = @{
-				Identity      = $configuredCertificate.Thumbprint
-				Server        = $Server
-				Configuration = $configuredCertificate
-			}
 			if ($storeObject) { $resDefault.ADObject = $storeObject }
 
 			if (-not $hasStore) {
-				New-TestResult @resDefault -Type 'Add'
+				New-TestResult @resDefault -Type 'Add' -Identity $configuredCertificate.Thumbprint -Configuration $configuredCertificate
 				continue
 			}
 
 			if ($configuredCertificate.Thumbprint -notin $storedCertificates.Thumbprint) {
-				New-TestResult @resDefault -Type 'Add'
+				New-TestResult @resDefault -Type 'Add' -Identity $configuredCertificate.Thumbprint -Configuration $configuredCertificate
 				continue
 			}
 		}
 		if (-not $hasStore) { return }
 		if (-not $script:ntAuthStoreAuthorative) { return }
-
+		
+		$resDefault = @{
+			Server = $Server
+		}
 		foreach ($storedCertificate in $storedCertificates) {
 			if ($storedCertificate.Thumbprint -notin $configuredCertificates.Thumbprint) {
-				New-TestResult @resDefault -Type 'Remove'
+				New-TestResult @resDefault -Type 'Remove' -Identity $storedCertificate.Thumbprint -ADObject $storedCertificate
 			}
 		}
 	}

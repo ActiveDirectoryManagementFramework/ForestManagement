@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.1.12 (2020-04-17)
+
+- New: Component: NTAuthStore certificates can now be deployed and defined via configuration
+
 ## 1.0.11 (2020-03-02)
 
 - Upd: Test-FMSchemaLdif - writes a warning when testing an object that has nocreation operation assigned, just modify, and is missing in AD.
