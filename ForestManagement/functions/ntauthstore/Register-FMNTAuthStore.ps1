@@ -32,13 +32,13 @@
 
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "Authorative")]
 		[switch]
-		$Authorative		
+		$Authorative
 	)
 	
 	process {
 		switch ($pscmdlet.ParameterSetName) {
 			Certificate { $script:ntAuthStoreCertificates[$Certificate.Thumbprint] = $Certificate }
 			Authorative { $script:ntAuthStoreAuthorative = $Authorative.ToBool() }
-		}		
+		}
 	}
 }
