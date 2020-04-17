@@ -3,7 +3,7 @@
 	RootModule = 'ForestManagement.psm1'
 	
 	# Version number of this module.
-	ModuleVersion = '1.0.11'
+	ModuleVersion = '1.1.12'
 	
 	# ID used to uniquely identify this module
 	GUID = '7de4379d-17c8-48d3-bd6d-93279aef64bb'
@@ -42,11 +42,13 @@
 	FunctionsToExport = @(
 		'Clear-FMConfiguration'
 		'Get-FMCallback'
+		'Get-FMNTAuthStore'
 		'Get-FMSchema'
 		'Get-FMSchemaLdif'
 		'Get-FMSite'
 		'Get-FMSiteLink'
 		'Get-FMSubnet'
+		'Invoke-FMNTAuthStore'
 		'Invoke-FMSchema'
 		'Invoke-FMSchemaLdif'
 		'Invoke-FMServer'
@@ -54,11 +56,13 @@
 		'Invoke-FMSiteLink'
 		'Invoke-FMSubnet'
 		'Register-FMCallback'
+		'Register-FMNTAuthStore'
 		'Register-FMSchema'
 		'Register-FMSchemaLdif'
 		'Register-FMSite'
 		'Register-FMSiteLink'
 		'Register-FMSubnet'
+		'Test-FMNTAuthStore'
 		'Test-FMSchema'
 		'Test-FMSchemaLdif'
 		'Test-FMServer'
@@ -66,6 +70,7 @@
 		'Test-FMSiteLink'
 		'Test-FMSubnet'
 		'Unregister-FMCallback'
+		'Unregister-FMNTAuthStore'
 		'Unregister-FMSchema'
 		'Unregister-FMSchemaLdif'
 		'Unregister-FMSite'
