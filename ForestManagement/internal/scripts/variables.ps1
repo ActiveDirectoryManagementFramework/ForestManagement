@@ -1,4 +1,8 @@
-﻿# Site Configurations
+﻿# NT Auth Store Configuration
+$script:ntAuthStoreCertificates = @{ }
+$script:ntAuthStoreAuthorative = $false
+
+# Site Configurations
 $script:sites = @{ }
 
 # Subnet Configurations
