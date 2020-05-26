@@ -63,6 +63,7 @@
 	[CmdletBinding()]
 	Param (
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[AllowEmptyCollection()]
 		[string[]]
 		$ObjectClass,
 		

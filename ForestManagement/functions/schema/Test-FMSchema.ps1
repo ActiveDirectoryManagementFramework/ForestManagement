@@ -60,7 +60,7 @@
 			if (-not $schemaObject) {
 				# If we already want to disable the attribute, no need to create it
 				if ($schemaSetting.Defunct) { continue }
-				
+
 				[PSCustomObject]@{
 					PSTypeName    = 'ForestManagement.Schema.TestResult'
 					Type          = 'ConfigurationOnly'
@@ -118,6 +118,13 @@
 				if (-not $mayContain -and $schemaSetting.ObjectClass) {
 					$isEqual = $false
 					$deltaProperties += 'ObjectClass'
+				}
+				elseif ($mayContain.Name -and -not $schemaSetting.ObjectClass) {
+					$isEqual = $false
+					$deltaProperties += 'ObjectClass'
+				}
+				elseif (-not $mayContain.Name -and -not $schemaSetting.ObjectClass) {
+					# Nothing wrong here
 				}
 				elseif ($mayContain.Name | Compare-Object $schemaSetting.ObjectClass) {
 					$isEqual = $false
