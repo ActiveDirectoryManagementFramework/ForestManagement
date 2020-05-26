@@ -83,6 +83,7 @@
 		$testResultsSorted = $testResult | Sort-Object {
 			if ($_.Type -eq 'Decommission') { 0 }
 			elseif ($_.Type -eq 'Rename') { 2 }
+			elseif ($_.Type -eq 'ConfigurationOnly') { 3 }
 			else { 1 }
 		}
 		:main foreach ($testItem in ($testResultsSorted)) {
