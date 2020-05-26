@@ -96,10 +96,35 @@
 
 						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Assigning.Attribute.ToObjectClass' -ActionStringValues $class -Target $testItem.Identity -ScriptBlock {
 							$classObject | Set-ADObject @parameters -Add @{ mayContain = $testItem.Configuration.LdapDisplayName } -ErrorAction Stop
-						} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet -Continue -RetryCount 10
+						} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue -RetryCount 10
 					}
 				}
 				#endregion Create new Schema Attribute
+
+				#region Decommission the unwanted Schema Attribute
+				'Decommission' {
+					$values = @{
+						IsDefunct = $true
+						PartialAttributeSet = $false
+					}
+					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Decommission.Attribute' -ActionStringValues $testItem.ADObject.LdapDisplayName, $testItem.ADObject.AttributeID -Target $testItem -ScriptBlock {
+						$testItem.ADObject | Set-ADObject @parameters -Replace $values -ErrorAction Stop
+					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+					$rootDSE = Get-ADRootDSE @parameters
+
+					foreach ($adObject in (Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(mayContain=$($testItem.Configuration.OID))" -Properties ldapDisplayName)) {
+						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Decommission.MayContain' -ActionStringValues $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName -Target $testItem -ScriptBlock {
+							$adObject | Set-ADObject @parameters -Remove @{ mayContain = $testItem.ADObject.LdapDisplayName } -ErrorAction Stop
+						} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+					}
+
+					foreach ($adObject in (Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(mustContain=$($testItem.Configuration.OID))" -Properties ldapDisplayName)) {
+						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Decommission.MustContain' -ActionStringValues $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName -Target $testItem -ScriptBlock {
+							$adObject | Set-ADObject @parameters -Remove @{ mustContain = $testItem.ADObject.LdapDisplayName } -ErrorAction Stop
+						} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+					}
+				}
+				#endregion Decommission the unwanted Schema Attribute
 
 				#region Update Schema Attribute
 				'InEqual' {
