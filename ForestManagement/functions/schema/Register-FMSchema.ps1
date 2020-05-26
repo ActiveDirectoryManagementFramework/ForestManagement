@@ -19,6 +19,10 @@
 	
 	.PARAMETER LdapDisplayName
 		The name of the attribute as LDAP sees it.
+
+	.PARAMETER Name
+		The name of the attribute.
+		Defaults to the AdminDisplayName if not specified.
 	
 	.PARAMETER OMSyntax
 		The OM Syntax of the attribute
@@ -73,6 +77,10 @@
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
 		[string]
 		$LdapDisplayName,
+
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
+		[string]
+		$Name,
 		
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
 		[int]
@@ -111,12 +119,16 @@
 	)
 	
 	process {
+		$nameResult = $Name
+		if (-not $Name) { $nameResult = $AdminDisplayName }
+
 		$script:schema[$OID] = [PSCustomObject]@{
 			PSTypeName          = 'ForestManagement.Schema.Configuration'
 			ObjectClass         = $ObjectClass
 			OID                 = $OID
 			AdminDisplayName    = $AdminDisplayName
 			LdapDisplayName     = $LdapDisplayName
+			Name                = $nameResult
 			OMSyntax            = $OMSyntax
 			AttributeSyntax     = $AttributeSyntax
 			SingleValued        = $SingleValued

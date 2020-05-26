@@ -58,6 +58,9 @@
 			$schemaObject = Get-ADObject @parameters -LDAPFilter "(attributeID=$($schemaSetting.OID))" -SearchBase $rootDSE.schemaNamingContext -ErrorAction Ignore -Properties *
 
 			if (-not $schemaObject) {
+				# If we already want to disable the attribute, no need to create it
+				if ($schemaSetting.Defunct) { continue }
+				
 				[PSCustomObject]@{
 					PSTypeName    = 'ForestManagement.Schema.TestResult'
 					Type          = 'ConfigurationOnly'
@@ -82,11 +85,21 @@
 					ADObject      = $schemaObject
 					Configuration = $schemaSetting
 				}
-				continue
 			}
-			# If the attribute is defunct and already processed, skip it
-			if ($schemaSetting.IsDefunct) { continue }
-			
+
+			if ($schemaSetting.Name -cne $schemaObject.cn) {
+				[PSCustomObject]@{
+					PSTypeName    = 'ForestManagement.Schema.TestResult'
+					Type          = 'Rename'
+					ObjectType    = 'Schema'
+					Identity      = $schemaSetting.AdminDisplayName
+					Changed       = @('Name')
+					Server        = $forest.SchemaMaster
+					ADObject      = $schemaObject
+					Configuration = $schemaSetting
+				}
+			}
+
 			$isEqual = $true
 			$deltaProperties = @()
 			
@@ -100,14 +113,16 @@
 			if ($schemaSetting.PartialAttributeSet -ne $schemaObject.isMemberOfPartialAttributeSet) { $isEqual = $false; $deltaProperties += 'PartialAttributeSet' }
 			if ($schemaSetting.AdvancedView -ne $schemaObject.showInAdvancedViewOnly) { $isEqual = $false; $deltaProperties += 'AdvancedView' }
 
-			$mayContain = Get-ADObject @parameters -LDAPFilter "(mayContain=$($schemaSetting.LdapDisplayName))" -SearchBase $rootDSE.schemaNamingContext
-			if (-not $mayContain -and $schemaSetting.ObjectClass) {
-				$isEqual = $false
-				$deltaProperties += 'ObjectClass'
-			}
-			elseif ($mayContain.Name | Compare-Object $schemaSetting.ObjectClass) {
-				$isEqual = $false
-				$deltaProperties += 'ObjectClass'
+			if (-not $schemaSetting.IsDefunct) {
+				$mayContain = Get-ADObject @parameters -LDAPFilter "(mayContain=$($schemaSetting.LdapDisplayName))" -SearchBase $rootDSE.schemaNamingContext
+				if (-not $mayContain -and $schemaSetting.ObjectClass) {
+					$isEqual = $false
+					$deltaProperties += 'ObjectClass'
+				}
+				elseif ($mayContain.Name | Compare-Object $schemaSetting.ObjectClass) {
+					$isEqual = $false
+					$deltaProperties += 'ObjectClass'
+				}
 			}
 
 			if (-not $isEqual) {
