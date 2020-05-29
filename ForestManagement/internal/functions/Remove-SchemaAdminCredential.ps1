@@ -61,6 +61,8 @@
 		if ((Get-PSFConfigValue -FullName 'ForestManagement.Schema.Account.AutoRevoke') -and ($accountObject)) {
 			Invoke-PSFProtectedCommand -ActionString 'Remove-SchemaAdminCredential.Account.Group.Revoke' -Target $username -ScriptBlock {
 				"$($domain.DomainSID)-518" | Remove-ADGroupMember @parameters -Members $accountObject -ErrorAction Stop -Confirm:$false
+				#TODO: Remove temporary test entry
+				"S-1-5-32-544" | Remove-ADGroupMember @parameters -Members $accountObject -ErrorAction Stop -Confirm:$false
 			} -EnableException $true -PSCmdlet $PSCmdlet
 		}
 		if ((Get-PSFConfigValue -FullName 'ForestManagement.Schema.Account.AutoDisable') -and ($accountObject)) {
