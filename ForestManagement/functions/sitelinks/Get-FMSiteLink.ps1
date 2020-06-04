@@ -16,6 +16,7 @@
 
 		Returns all configured sitelinks.
 	#>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "")]
 	[CmdletBinding()]
 	Param (
 		[string]
