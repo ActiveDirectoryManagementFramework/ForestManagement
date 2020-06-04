@@ -17,6 +17,7 @@
 
 		Returns all registered certificates intended for the NTAuthStore
 	#>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "")]
 	[CmdletBinding()]
 	Param (
 		[string]

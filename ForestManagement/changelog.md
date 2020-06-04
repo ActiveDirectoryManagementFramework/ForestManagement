@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## 1.1.15 (2020-06-04)
+
+- Upd: Schema Component - changed identifier to OID
+- Upd: Schema Component - added IsDefunct property and attribute decommissioning process
+- Upd: Schema Component - case sensitive data comparison
+
 ## 1.1.12 (2020-04-17)
 
 - New: Component: NTAuthStore certificates can now be deployed and defined via configuration

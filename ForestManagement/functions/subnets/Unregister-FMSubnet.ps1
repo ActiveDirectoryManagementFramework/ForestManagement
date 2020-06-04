@@ -15,6 +15,7 @@
 
 			Removes the subnet "1.2.3.4/32"
 	#>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "")]
 	[CmdletBinding()]
 	Param (
 		[Parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, Mandatory = $true)]

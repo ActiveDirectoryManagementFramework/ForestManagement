@@ -80,7 +80,13 @@
 	{
 		if (Test-PSFFunctionInterrupt) { return }
 
-		:main foreach ($testItem in $testResult) {
+		$testResultsSorted = $testResult | Sort-Object {
+			if ($_.Type -eq 'Decommission') { 0 }
+			elseif ($_.Type -eq 'Rename') { 2 }
+			elseif ($_.Type -eq 'ConfigurationOnly') { 3 }
+			else { 1 }
+		}
+		:main foreach ($testItem in ($testResultsSorted)) {
 			switch ($testItem.Type) {
 				#region Create new Schema Attribute
 				'ConfigurationOnly' {
@@ -96,10 +102,35 @@
 
 						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Assigning.Attribute.ToObjectClass' -ActionStringValues $class -Target $testItem.Identity -ScriptBlock {
 							$classObject | Set-ADObject @parameters -Add @{ mayContain = $testItem.Configuration.LdapDisplayName } -ErrorAction Stop
-						} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet -Continue -RetryCount 10
+						} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue -RetryCount 10
 					}
 				}
 				#endregion Create new Schema Attribute
+
+				#region Decommission the unwanted Schema Attribute
+				'Decommission' {
+					$values = @{
+						IsDefunct = $true
+						# PartialAttributeSet = $false
+					}
+					foreach ($adObject in (Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(mayContain=$($testItem.Configuration.OID))" -Properties ldapDisplayName)) {
+						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Decommission.MayContain' -ActionStringValues $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName -Target $testItem -ScriptBlock {
+							$adObject | Set-ADObject @parameters -Remove @{ mayContain = $testItem.ADObject.LdapDisplayName } -ErrorAction Stop
+						} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+					}
+
+					foreach ($adObject in (Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(mustContain=$($testItem.Configuration.OID))" -Properties ldapDisplayName)) {
+						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Decommission.MustContain' -ActionStringValues $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName -Target $testItem -ScriptBlock {
+							$adObject | Set-ADObject @parameters -Remove @{ mustContain = $testItem.ADObject.LdapDisplayName } -ErrorAction Stop
+						} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+					}
+
+					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Decommission.Attribute' -ActionStringValues $testItem.ADObject.LdapDisplayName, $testItem.ADObject.AttributeID -Target $testItem -ScriptBlock {
+						$testItem.ADObject | Set-ADObject @parameters -Replace $values -ErrorAction Stop
+					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+					$rootDSE = Get-ADRootDSE @parameters
+				}
+				#endregion Decommission the unwanted Schema Attribute
 
 				#region Update Schema Attribute
 				'InEqual' {
@@ -109,6 +140,9 @@
 							$testItem.ADObject | Set-ADObject @parameters -Replace $resolvedAttributes -ErrorAction Stop
 						} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet -Continue
 					}
+
+					# Do not process MayContain for defunct attributes
+					if ($testItem.Configuration.IsDefunct) { continue }
 
 					foreach ($class in  $testItem.Configuration.ObjectClass) {
 						try { $classObject = Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(name=$($class))" -ErrorAction Stop -Properties mayContain }
@@ -123,6 +157,14 @@
 					}
 				}
 				#endregion Update Schema Attribute
+
+				#region Rename Schema Attribute
+				'Rename' {
+					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Rename.Attribute' -ActionStringValues $testItem.ADObject.cn, $testItem.Configuration.Name -Target $testItem -ScriptBlock {
+						$testItem.ADObject | Rename-ADObject -NewName $testItem.Configuration.Name -ErrorAction Stop
+					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+				}
+				#endregion Rename Schema Attribute
 			}
 		}
 	}
