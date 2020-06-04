@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## ???
+## 1.1.15 (2020-06-04)
 
 - Upd: Schema Component - changed identifier to OID
 - Upd: Schema Component - added IsDefunct property and attribute decommissioning process
