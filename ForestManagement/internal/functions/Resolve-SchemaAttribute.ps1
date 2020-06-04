@@ -57,7 +57,7 @@
 		{
 			foreach ($attributeName in $attributeNames)
 			{
-				if ($ADobject.$attributeName -eq $attributes[$attributeName])
+				if ($ADobject.$attributeName -ceq $attributes[$attributeName])
 				{
 					$attributes.Remove($attributeName)
 				}
