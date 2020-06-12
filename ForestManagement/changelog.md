@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.1.16 (2020-06-12)
+
+- Upd: Added retries after schema credential switch
+
 ## 1.1.15 (2020-06-04)
 
 - Upd: Schema Component - changed identifier to OID
