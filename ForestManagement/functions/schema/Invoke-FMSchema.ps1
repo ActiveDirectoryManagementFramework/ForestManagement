@@ -69,6 +69,10 @@
 			if ($cred) { $parameters['Credential'] = $cred }
 		} -EnableException $EnableException -PSCmdlet $PSCmdlet
 		if (Test-PSFFunctionInterrupt) { return }
+		$null = Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Credentials.Test' -Target $forest.SchemaMaster -ScriptBlock {
+			$null = Get-ADDomain @parameters -ErrorAction Stop
+		} -EnableException $EnableException -PSCmdlet $PSCmdlet -RetryCount 5 -RetryWait 1
+		if (Test-PSFFunctionInterrupt) { return }
 		#endregion Resolve Credentials
 
 		$testResult = Test-FMSchema @parameters

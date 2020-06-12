@@ -112,7 +112,7 @@
 			if ($schemaSetting.SearchFlags -ne $schemaObject.searchflags) { $isEqual = $false; $deltaProperties += 'SearchFlags' }
 			if ($schemaSetting.PartialAttributeSet -ne $schemaObject.isMemberOfPartialAttributeSet) { $isEqual = $false; $deltaProperties += 'PartialAttributeSet' }
 			if ($schemaSetting.AdvancedView -ne $schemaObject.showInAdvancedViewOnly) { $isEqual = $false; $deltaProperties += 'AdvancedView' }
-			if (-not $schemaSetting.IsDefunct -and $schemaSetting.IsDefunct -ne $schemaObject.isDefunct) { $isEqual = $false; $deltaProperties += 'IsDefunct' }
+			if (-not $schemaSetting.IsDefunct -and $schemaObject.isDefunct) { $isEqual = $false; $deltaProperties += 'IsDefunct' }
 
 			if (-not $schemaSetting.IsDefunct) {
 				$mayContain = Get-ADObject @parameters -LDAPFilter "(mayContain=$($schemaSetting.LdapDisplayName))" -SearchBase $rootDSE.schemaNamingContext
