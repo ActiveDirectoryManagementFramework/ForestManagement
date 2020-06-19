@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.1.17 (2020-06-19)
+
+- Fix: Test-FMSchema - tries to create defnct attributes
+
 ## 1.1.16 (2020-06-12)
 
 - Upd: Added retries after schema credential switch
