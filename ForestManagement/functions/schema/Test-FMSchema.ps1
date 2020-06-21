@@ -59,7 +59,7 @@
 
 			if (-not $schemaObject) {
 				# If we already want to disable the attribute, no need to create it
-				if ($schemaSetting.Defunct) { continue }
+				if ($schemaSetting.IsDefunct) { continue }
 
 				[PSCustomObject]@{
 					PSTypeName    = 'ForestManagement.Schema.TestResult'
