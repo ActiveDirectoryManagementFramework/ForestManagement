@@ -1,4 +1,7 @@
-﻿# NT Auth Store Configuration
+﻿# Forest Level
+$script:forestlevel = $null
+
+# NT Auth Store Configuration
 $script:ntAuthStoreCertificates = @{ }
 $script:ntAuthStoreAuthorative = $false
 

@@ -26,7 +26,7 @@
 	# Modules that must be imported into the global environment prior to importing
 	# this module
 	RequiredModules = @(
-		@{ ModuleName='PSFramework'; ModuleVersion='1.1.59' }
+		@{ ModuleName='PSFramework'; ModuleVersion='1.4.146' }
 	)
 	
 	# Assemblies that must be loaded prior to importing this module
@@ -42,12 +42,14 @@
 	FunctionsToExport = @(
 		'Clear-FMConfiguration'
 		'Get-FMCallback'
+		'Get-FMForestLevel'
 		'Get-FMNTAuthStore'
 		'Get-FMSchema'
 		'Get-FMSchemaLdif'
 		'Get-FMSite'
 		'Get-FMSiteLink'
 		'Get-FMSubnet'
+		'Invoke-FMForestLevel'
 		'Invoke-FMNTAuthStore'
 		'Invoke-FMSchema'
 		'Invoke-FMSchemaLdif'
@@ -56,12 +58,14 @@
 		'Invoke-FMSiteLink'
 		'Invoke-FMSubnet'
 		'Register-FMCallback'
+		'Register-FMForestLevel'
 		'Register-FMNTAuthStore'
 		'Register-FMSchema'
 		'Register-FMSchemaLdif'
 		'Register-FMSite'
 		'Register-FMSiteLink'
 		'Register-FMSubnet'
+		'Test-FMForestLevel'
 		'Test-FMNTAuthStore'
 		'Test-FMSchema'
 		'Test-FMSchemaLdif'
@@ -70,6 +74,7 @@
 		'Test-FMSiteLink'
 		'Test-FMSubnet'
 		'Unregister-FMCallback'
+		'Unregister-FMForestLevel'
 		'Unregister-FMNTAuthStore'
 		'Unregister-FMSchema'
 		'Unregister-FMSchemaLdif'
