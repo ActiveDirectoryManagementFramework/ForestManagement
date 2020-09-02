@@ -1,5 +1,10 @@
 ﻿# Changelog
 
+## ???
+
+- Fix: Unregister-FMSubnet - doesn't do a damn thing
+- Fix: Invoke-FMNTAuthStore - will now doublecheck whether certificate was correctly applied
+
 ## 1.1.17 (2020-06-19)
 
 - Fix: Test-FMSchema - tries to create defnct attributes

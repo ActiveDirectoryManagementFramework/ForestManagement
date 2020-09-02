@@ -122,6 +122,15 @@
 						if (-not $result.Success) {
 							throw "Error executing $($result.Stage) : $($result.Error)"
 						}
+						$rootDSE = Get-ADRootDSE @parameters
+						$storeObject = Get-ADObject @parameters -Identity "CN=NTAuthCertificates,CN=Public Key Services,CN=Services,$($rootDSE.configurationNamingContext)" -ErrorAction Stop -Properties cACertificate
+						$storedCertificates = $storeObject.cACertificate | ForEach-Object {
+							[System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_)
+						}
+						if ($testResult.Configuration.Certificate.Thumbprint -notin $storedCertificates.Thumbprint)
+						{
+							throw "Certificate could not be applied successfully for unclarified reasons! Ensure you have the permissions needed for this operation."
+						}
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue -ContinueLabel main
 				}
 				'Remove' {

@@ -25,7 +25,7 @@
 	
 	process
 	{
-		foreach ($nameItem in $SiteName) {
+		foreach ($nameItem in $Name) {
 			$script:subnets.Remove($nameItem)
 		}
 	}
