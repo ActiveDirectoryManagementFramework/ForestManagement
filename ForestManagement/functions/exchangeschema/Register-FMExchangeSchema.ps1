@@ -7,7 +7,7 @@
 	.DESCRIPTION
 		Registers an exchange version to apply to the forest's schema and configuration.
 		Updating both requires both Schema Admin and Enterprise Admin permissions.
-	
+		
 		Domain-Level changes to Exchange are handled by the DomainManagement module.
 	
 	.PARAMETER LocalImagePath
@@ -30,6 +30,11 @@
 		The object version on the msExchOrganizationContainer type object in the configuration.
 		Do NOT confuse that with the ObjectVersion of the exchange object in the default Naming Context (regular domain space).
 	
+	.PARAMETER OrganizationName
+		The name of the Exchange Organization.
+		Only used for CREATING a new Exchange deployment.
+		Make sure to customize this if you are picky about names like that.
+	
 	.PARAMETER ContextName
 		The name of the context defining the setting.
 		This allows determining the configuration set that provided this setting.
@@ -37,7 +42,7 @@
 	
 	.EXAMPLE
 		PS C:\> Register-FMExchangeSchema -LocalImagePath 'C:\ISO\exchange-2019-cu6.iso' -ExchangeVersion '2019CU6'
-	
+		
 		Registers the Exchange 2019 CU6 exchange version as exchange forest settings to be applied.
 #>
 	[CmdletBinding()]
@@ -61,6 +66,9 @@
 		$ObjectVersion,
 		
 		[string]
+		$OrganizationName = 'Exchange Organization',
+		
+		[string]
 		$ContextName = '<Undefined>'
 	)
 	
@@ -72,6 +80,7 @@
 			ObjectVersion   = $ObjectVersion
 			LocalImagePath  = $LocalImagePath
 			ExchangeVersion = (Get-ExchangeVersion | Where-Object RangeUpper -eq $RangeUpper | Where-Object ObjectVersionConfig -EQ $ObjectVersion | Sort-Object Name | Select-Object -Last 1).Name
+			OrganizationName = $OrganizationName
 			ContextName	    = $ContextName
 		}
 		
@@ -87,7 +96,7 @@
 		Add-Member -InputObject $object -MemberType ScriptMethod -Name ToString -Value {
 			if ($this.ExchangeVersion) { $this.ExchangeVersion }
 			else { '{0} : {1}' -f $this.RangeUpper, $this.ObjectVersion }
-		}
-		$script:exchangeschema = $object
+		} -Force
+		$script:exchangeschema = @($object)
 	}
 }

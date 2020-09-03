@@ -85,19 +85,22 @@
 				$Session,
 				
 				[string]
-				$Path
+				$Path,
+				
+				[string]
+				$OrganizationName
 			)
 			
 			$result = Invoke-Command -Session $Session -ScriptBlock {
 				$exchangeIsoPath = Resolve-Path -Path $using:Path
 				
 				# Mount Volume
-				$diskImage = Mount-DiskImage -ImagePath $exchangeIsoPath
+				$diskImage = Mount-DiskImage -ImagePath $exchangeIsoPath -PassThru
 				$volume = Get-Volume -DiskImage $diskImage
 				$installPath = "$($volume.DriveLetter):\setup.exe"
 				
 				# Perform Installation
-				$resultText = & $installPath /IAcceptExchangeServerLicenseTerms /PrepareAD 2>&1
+				$resultText = & $installPath /IAcceptExchangeServerLicenseTerms /PrepareAD /OrganizationName:$OrganizationName 2>&1
 				$results = [pscustomobject]@{
 					Success = $LASTEXITCODE -lt 1
 					Message = $resultText -join "`n"
@@ -133,7 +136,7 @@
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Installing' -ActionStringValues $testItem.Configuration -Target $forestObject -ScriptBlock {
-						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -ErrorAction Stop
+						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.Configuration.OrganizationName -ErrorAction Stop
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 				}
 				#endregion Install Exchange Schema
@@ -145,7 +148,7 @@
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Updating' -ActionStringValues $testItem.ADObject, $testItem.Configuration -Target $forestObject -ScriptBlock {
-						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -ErrorAction Stop
+						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.ADObject.OrganizationName -ErrorAction Stop
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 				}
 				#endregion Update Exchange Schema

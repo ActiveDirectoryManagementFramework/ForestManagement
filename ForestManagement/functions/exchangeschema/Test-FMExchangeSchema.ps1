@@ -59,6 +59,18 @@
 			$rootDSE = Get-ADRootDSE @parameters
 			(Get-ADObject @parameters -SearchBase $rootDSE.configurationNamingContext -LDAPFilter '(objectClass=msExchOrganizationContainer)' -Properties ObjectVersion).ObjectVersion
 		}
+		
+		function Get-ExchangeOrganizationName
+		{
+			[CmdletBinding()]
+			param (
+				[hashtable]
+				$Parameters
+			)
+			
+			$rootDSE = Get-ADRootDSE @parameters
+			(Get-ADObject @parameters -SearchBase $rootDSE.configurationNamingContext -LDAPFilter '(objectClass=msExchOrganizationContainer)').Name
+		}
 		#endregion Utility Functions
 	}
 	process
@@ -71,12 +83,13 @@
 		$adData = [pscustomobject]@{
 			SchemaVersion = $schemaVersion
 			ObjectVersion = $objectVersion
-			DisplayName = $displayName
+			DisplayName   = $displayName
+			OrganizationName = Get-ExchangeOrganizationName -Parameters $parameters
 		}
 		Add-Member -InputObject $adData -MemberType ScriptMethod -Name ToString -Value {
 			if ($this.DisplayName) { $this.DisplayName }
 			else { '{0} : {1}' -f $this.SchemaVersion, $this.ObjectVersion }
-		}
+		} -Force
 		$configuredData = Get-FMExchangeSchema
 		
 		if (-not $schemaVersion -or -not $objectVersion)
