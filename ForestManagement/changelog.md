@@ -2,6 +2,7 @@
 
 ## ???
 
+- New: Component: Exchange Schema - manage the forest level settings of Exchange.
 - New: Component: ForestLevel - manage the forest functional level
 - Fix: Unregister-FMSubnet - doesn't do a damn thing
 - Fix: Invoke-FMNTAuthStore - will now doublecheck whether certificate was correctly applied

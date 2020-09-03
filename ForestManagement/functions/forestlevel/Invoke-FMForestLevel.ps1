@@ -57,7 +57,7 @@
 				'Raise'
 				{
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMForestLevel.Raise.Level' -ActionStringValues $testItem.Configuration.Level -Target $testItem.ADObject -ScriptBlock {
-						Set-ADForestMode @parameters -ForestMode $testItem.Configuration.DesiredLevel
+						Set-ADForestMode @parameters -ForestMode $testItem.Configuration.DesiredLevel -Identity $testItem.ADObject -ErrorAction Stop -Confirm:$false
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 				}
 			}

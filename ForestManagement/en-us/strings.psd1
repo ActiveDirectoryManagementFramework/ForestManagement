@@ -21,6 +21,11 @@
 	'Invoke-Callback.Invoking.Failed'							  = 'Error executing callback: {0}' # $callback.Name
 	'Invoke-Callback.Invoking.Success'						      = 'Successfully executed callback: {0}' # $callback.Name
 	
+	'Invoke-FMExchangeSchema.WinRM.Failed'					      = 'Failed to connect to "{0}" via WinRM/PowerShell Remoting.'
+	'Invoke-FMExchangeSchema.IsoPath.Missing'					  = 'Cannot find the specified exchange ISO file on the target computer: {0}'
+	'Invoke-FMExchangeSchema.Installing'						  = 'Installing Exchange Forest settings for {0}'
+	'Invoke-FMExchangeSchema.Updating'						      = 'Updating Exchange Forest settings from {0} to {1}'
+	
 	'Invoke-FMForestLevel.Raise.Level'						      = 'Raising forest level to {0}' # $testItem.Configuration.Level
 	
 	'Invoke-FMNTAuthStore.Add'								      = 'Adding certificate to the NTAuthStore: {0}' # $testResult.Configuration.Subject

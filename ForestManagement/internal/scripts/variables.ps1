@@ -1,4 +1,7 @@
-﻿# Forest Level
+﻿# Exchange Schema Version
+$script:exchangeschema = $null
+
+# Forest Level
 $script:forestlevel = $null
 
 # NT Auth Store Configuration

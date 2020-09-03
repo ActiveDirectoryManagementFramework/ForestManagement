@@ -127,7 +127,7 @@
 						$storedCertificates = $storeObject.cACertificate | ForEach-Object {
 							[System.Security.Cryptography.X509Certificates.X509Certificate2]::new($_)
 						}
-						if ($testResult.Configuration.Certificate.Thumbprint -notin $storedCertificates.Thumbprint)
+						if ($testResult.Configuration.Thumbprint -notin $storedCertificates.Thumbprint)
 						{
 							throw "Certificate could not be applied successfully for unclarified reasons! Ensure you have the permissions needed for this operation."
 						}

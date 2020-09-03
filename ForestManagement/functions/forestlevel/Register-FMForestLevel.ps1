@@ -23,7 +23,7 @@
 	[CmdletBinding()]
 	param (
 		[ValidateSet('2008R2', '2012', '2012R2', '2016')]
-		[int]
+		[string]
 		$Level,
 		
 		[string]
@@ -32,10 +32,10 @@
 	
 	process
 	{
-		$script:forestlevel = [PSCustomObject]@{
+		$script:forestlevel = @([PSCustomObject]@{
 			PSTypeName  = 'ForestManagement.Configuration.ForestLevel'
 			Level	    = $Level
 			ContextName = $ContextName
-		}
+		})
 	}
 }
