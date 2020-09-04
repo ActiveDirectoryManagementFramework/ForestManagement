@@ -88,7 +88,10 @@
 				$Path,
 				
 				[string]
-				$OrganizationName
+				$OrganizationName,
+				
+				[switch]
+				$SchemaOnly
 			)
 			
 			$result = Invoke-Command -Session $Session -ScriptBlock {
@@ -100,7 +103,8 @@
 				$installPath = "$($volume.DriveLetter):\setup.exe"
 				
 				# Perform Installation
-				$resultText = & $installPath /IAcceptExchangeServerLicenseTerms /PrepareAD /OrganizationName:$OrganizationName 2>&1
+				if ($using:SchemaOnly) { $resultText = & $installPath /IAcceptExchangeServerLicenseTerms /PrepareSchema 2>&1 }
+				else { $resultText = & $installPath /IAcceptExchangeServerLicenseTerms /PrepareAD /OrganizationName:$using:OrganizationName 2>&1 }
 				$results = [pscustomobject]@{
 					Success = $LASTEXITCODE -lt 1
 					Message = $resultText -join "`n"
@@ -129,6 +133,32 @@
 			switch ($testItem.Type)
 			{
 				#region Install Exchange Schema
+				'CreateSchema'
+				{
+					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath))
+					{
+						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
+					}
+					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Installing' -ActionStringValues $testItem.Configuration -Target $forestObject -ScriptBlock {
+						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.Configuration.OrganizationName -ErrorAction Stop -SchemaOnly
+					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+				}
+				#endregion Install Exchange Schema
+				
+				#region Update Exchange Schema
+				'UpdateUpdate'
+				{
+					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath))
+					{
+						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
+					}
+					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Updating' -ActionStringValues $testItem.ADObject, $testItem.Configuration -Target $forestObject -ScriptBlock {
+						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.ADObject.OrganizationName -ErrorAction Stop -SchemaOnly
+					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+				}
+				#endregion Update Exchange Schema
+				
+				#region Install Exchange Schema & AD Objects
 				'Create'
 				{
 					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath))
@@ -139,8 +169,9 @@
 						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.Configuration.OrganizationName -ErrorAction Stop
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 				}
-				#endregion Install Exchange Schema
-				#region Update Exchange Schema
+				#endregion Install Exchange Schema & AD Objects
+				
+				#region Update Exchange Schema & AD Objects
 				'Update'
 				{
 					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath))
@@ -151,7 +182,7 @@
 						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.ADObject.OrganizationName -ErrorAction Stop
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 				}
-				#endregion Update Exchange Schema
+				#endregion Update Exchange Schema & AD Objects
 			}
 			#endregion Apply Updates if needed
 		}

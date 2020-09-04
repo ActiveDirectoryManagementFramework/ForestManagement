@@ -92,13 +92,27 @@
 		} -Force
 		$configuredData = Get-FMExchangeSchema
 		
-		if (-not $schemaVersion -or -not $objectVersion)
+		if ($configuredData.SchemaOnly)
 		{
-			New-TestResult -ObjectType ExchangeSchema -Type Create -Identity $forest -Server $Server -Configuration $configuredData -ADObject $adData
+			if (-not $schemaVersion)
+			{
+				New-TestResult -ObjectType ExchangeSchema -Type CreateSchema -Identity $forest -Server $Server -Configuration $configuredData -ADObject $adData
+			}
+			elseif ($configuredData.RangeUpper -gt $schemaVersion)
+			{
+				New-TestResult -ObjectType ExchangeSchema -Type UpdateSchema -Identity $forest -Server $Server -Configuration $configuredData -ADObject $adData
+			}
 		}
-		elseif (($configuredData.RangeUpper -gt $schemaVersion) -or ($configuredData.ObjectVersion -gt $objectVersion))
+		else
 		{
-			New-TestResult -ObjectType ExchangeSchema -Type Update -Identity $forest -Server $Server -Configuration $configuredData -ADObject $adData
+			if (-not $schemaVersion -or -not $objectVersion)
+			{
+				New-TestResult -ObjectType ExchangeSchema -Type Create -Identity $forest -Server $Server -Configuration $configuredData -ADObject $adData
+			}
+			elseif (($configuredData.RangeUpper -gt $schemaVersion) -or ($configuredData.ObjectVersion -gt $objectVersion))
+			{
+				New-TestResult -ObjectType ExchangeSchema -Type Update -Identity $forest -Server $Server -Configuration $configuredData -ADObject $adData
+			}
 		}
 	}
 }

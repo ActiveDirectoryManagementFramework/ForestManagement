@@ -4,7 +4,8 @@
         <SelectionSet>
             <Name>ForestManagement.TestResults</Name>
             <Types>
-                <TypeName>ForestManagement.ForestLevel.TestResult</TypeName>
+                <TypeName>ForestManagement.ExchangeSchema.TestResult</TypeName>
+				<TypeName>ForestManagement.ForestLevel.TestResult</TypeName>
 				<TypeName>ForestManagement.NTAuthStore.TestResult</TypeName>
 				<TypeName>ForestManagement.Schema.TestResult</TypeName>
                 <TypeName>ForestManagement.SchemaLdif.TestResult</TypeName>

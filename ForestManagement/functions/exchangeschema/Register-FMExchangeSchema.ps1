@@ -35,6 +35,10 @@
 		Only used for CREATING a new Exchange deployment.
 		Make sure to customize this if you are picky about names like that.
 	
+	.PARAMETER SchemaOnly
+		Whether to only apply the schema updates.
+		Enabling this will mean no configuration scope changes are applied and the root domain also will not be pre-configured for Exchange.
+	
 	.PARAMETER ContextName
 		The name of the context defining the setting.
 		This allows determining the configuration set that provided this setting.
@@ -68,6 +72,9 @@
 		[string]
 		$OrganizationName = 'Exchange Organization',
 		
+		[switch]
+		$SchemaOnly,
+		
 		[string]
 		$ContextName = '<Undefined>'
 	)
@@ -81,6 +88,7 @@
 			LocalImagePath  = $LocalImagePath
 			ExchangeVersion = (Get-ExchangeVersion | Where-Object RangeUpper -eq $RangeUpper | Where-Object ObjectVersionConfig -EQ $ObjectVersion | Sort-Object Name | Select-Object -Last 1).Name
 			OrganizationName = $OrganizationName
+			SchemaOnly	    = $SchemaOnly.ToBool()
 			ContextName	    = $ContextName
 		}
 		
