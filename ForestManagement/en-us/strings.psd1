@@ -5,6 +5,8 @@
 	
 	'Assert-Configuration.NotConfigured'						  = 'No configuration found for {0}' # $Type
 	
+	'General.Invalid.Input'									      = 'Invalid input: {1}! This command only accepts output objects from {0}' # 'Test-FMSchemaDefaultPermission', $testItem
+	
 	'Get-SchemaAdminCredential.Account.Assignment.Failure'	      = 'Failed to add temporary schema admin account {0} to group schema admins!' # $newName
 	'Get-SchemaAdminCredential.Account.Creation'				  = 'Creating admin account for schema administration' # 
 	'Get-SchemaAdminCredential.Account.Disabled'				  = 'Account for schema administration: {0} is disabled! Enable it or set the "ForestManagement.Schema.Account.AutoEnable" setting' # $accountName
@@ -21,10 +23,10 @@
 	'Invoke-Callback.Invoking.Failed'							  = 'Error executing callback: {0}' # $callback.Name
 	'Invoke-Callback.Invoking.Success'						      = 'Successfully executed callback: {0}' # $callback.Name
 	
-	'Invoke-FMExchangeSchema.WinRM.Failed'					      = 'Failed to connect to "{0}" via WinRM/PowerShell Remoting.'
-	'Invoke-FMExchangeSchema.IsoPath.Missing'					  = 'Cannot find the specified exchange ISO file on the target computer: {0}'
-	'Invoke-FMExchangeSchema.Installing'						  = 'Installing Exchange Forest settings for {0}'
-	'Invoke-FMExchangeSchema.Updating'						      = 'Updating Exchange Forest settings from {0} to {1}'
+	'Invoke-FMExchangeSchema.Installing'						  = 'Installing Exchange Forest settings for {0}' # $testItem.Configuration
+	'Invoke-FMExchangeSchema.IsoPath.Missing'					  = 'Cannot find the specified exchange ISO file on the target computer: {0}' # $testItem.Configuration.LocalImagePath
+	'Invoke-FMExchangeSchema.Updating'						      = 'Updating Exchange Forest settings from {0} to {1}' # $testItem.ADObject, $testItem.Configuration
+	'Invoke-FMExchangeSchema.WinRM.Failed'					      = 'Failed to connect to "{0}" via WinRM/PowerShell Remoting.' # $computerName
 	
 	'Invoke-FMForestLevel.Raise.Level'						      = 'Raising forest level to {0}' # $testItem.Configuration.Level
 	
@@ -36,15 +38,27 @@
 	'Invoke-FMSchema.Assigning.Attribute.ToObjectClass'		      = 'Assigning attribute to object class {0}' # $class
 	'Invoke-FMSchema.Connect.Failed'							  = 'Failed to connect to {0}' # $Server
 	'Invoke-FMSchema.Creating.Attribute'						  = 'Creating a new schema attribute' # 
+	'Invoke-FMSchema.Credentials.Test'						      = 'Testing ADWS connectivity to the Schema Master' # 
 	'Invoke-FMSchema.Decommission.Attribute'					  = 'Deprecating attribute {0} with ID {1}' # $testItem.ADObject.LdapDisplayName, $testItem.ADObject.AttributeID
-	'Invoke-FMSchema.Decommission.MayContain'					  = 'Removing attribute {0} from class''s {1} MayContain attribute' # $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName
-	'Invoke-FMSchema.Decommission.MustContain'				      = 'Removing attribute {0} from class''s {1} MustContain attribute' # $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName
+	'Invoke-FMSchema.Decommission.MayContain'					  = 'Removing attribute {0} from class''s { 1 } MayContain attribute' # $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName
+	'Invoke-FMSchema.Decommission.MustContain'				      = 'Removing attribute { 0 } from class''s {1} MustContain attribute' # $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName
 	'Invoke-FMSchema.Reading.ObjectClass.Failed'				  = 'Error searching for object class {0}' # $class
 	'Invoke-FMSchema.Reading.ObjectClass.NotFound'			      = 'Failed to find object class {0}' # $class
 	'Invoke-FMSchema.Rename.Attribute'						      = 'Renaming attribute {0} to {1}' # $testItem.ADObject.cn, $testItem.Configuration.Name
 	'Invoke-FMSchema.Schema.Credentials'						  = 'Resolving credentials for schema administration' # 
 	'Invoke-FMSchema.Schema.Credentials.Release'				  = 'Releasing/Postprocessing credentials used for schema administration' # 
 	'Invoke-FMSchema.Updating.Attribute'						  = 'Updating the attribute, modifying {0}' # ($resolvedAttributes.Keys -join ', ')
+	
+	'Invoke-FMSchemaDefaultPermission.AccessRule.Add'			  = 'Adding permissions to {0} : Granting {1} ({2})' # $change.Identity, $change.Privilege, $change.Access
+	'Invoke-FMSchemaDefaultPermission.AccessRule.Remove'		  = 'Removing permissions to {0} : Revoking {1} ({2})' # $change.Identity, $change.Privilege, $change.Access
+	'Invoke-FMSchemaDefaultPermission.Connect.Failed'			  = 'Failed to connect to {0} via ADWS' # $Server
+	'Invoke-FMSchemaDefaultPermission.Credentials.Test'		      = 'Testing Schema-Update credentials' # 
+	'Invoke-FMSchemaDefaultPermission.IdentityError'			  = 'Skipping processing {0} - error resolving identity' # $testItem.Identity
+	'Invoke-FMSchemaDefaultPermission.NotFound'				      = 'Skipping processing {0} - object class does not exist' # $testItem.Identity
+	'Invoke-FMSchemaDefaultPermission.Permissions.Update'		  = 'Updating {2}, processing {0} out of {1} changes' # $tracking.Count, $testItem.Changed.Count, $testItem.Identity
+	'Invoke-FMSchemaDefaultPermission.Schema.Credentials'		  = 'Resolving schema admin credentials' # 
+	'Invoke-FMSchemaDefaultPermission.Schema.Credentials.Release' = 'Releasing schema admin credentials' # 
+	'Invoke-FMSchemaDefaultPermission.WinRM.Connect'			  = 'Connecting via WinRM' # 
 	
 	'Invoke-FMSchemaLdif.Connect.Failed'						  = 'Failed to connect to {0}' # $Server
 	'Invoke-FMSchemaLdif.Invoke.File'							  = 'Loading LDIF file schema extension: {0}' # $testItem.Identity
@@ -84,6 +98,11 @@
 	
 	'Test-FMSchema.Connect.Failed'							      = 'Failed to connect to {0}' # $Server
 	
+	'Test-FMSchemaDefaultPermission.Class.IdentityUncertain'	  = 'Unable to resolve all identities for the default permissions to apply to {0}. This objectclass will be skipped instead.' # $Configuration[0].ClassName
+	'Test-FMSchemaDefaultPermission.Class.NotFound'			      = 'Unable to find object class {0}. Make sure the configuration does not contain a typo and that all schema updates have been applied.' # $className
+	'Test-FMSchemaDefaultPermission.Connect.Failed'			      = 'Unable to connect to {0} via ADWS.' # $Server
+	'Test-FMSchemaDefaultPermission.Principal.ResolutionError'    = 'Unable to resolve {0}! Value after string resolution: {1}' # $AccessRule.Identity, $basicHash.ResolvedIdentity
+	'Test-FMSchemaDefaultPermission.WinRM.Connect'			      = 'Unable to connect via WinRM' # 
 	
 	'Test-FMSchemaLdif.Connect.Failed'						      = 'Failed to connect to {0}' # $Server
 	'Test-FMSchemaLdif.Missing.SchemaItem'					      = 'Defining changes for {0} when object has not been defined and does not exist!' # $attributeName
@@ -94,5 +113,5 @@
 	'Test-FMSiteLink.Information.MultipleSites'				      = 'Sitelink with {1} sites found. This is not a problem, but not supported by this tool, sitelink will be ignored: {1}' # $siteLink.DistinguishedName, $siteLink.siteList.Count
 	
 	'Validate.Path.SingleFile.Failed'							  = 'Input does not point at a single, existing file: {0} | Make sure the path notation is correct, relative paths are supported.' # <user input>, <validation item>
-	'Validate.Subnet.Failed'									  = 'Input is not a legal subnet: {0} | Please offer an IPv4/Subnetsize notation subnet. E.g.: "1.2.3.4/24"' # <user input>, <validation item>>
+	'Validate.Subnet.Failed'									  = 'Input is not a legal subnet: {0} | Please offer an IPv4/Subnetsize notation subnet. E.g.: "1.2.3.4/24"' # <user input>, <validation item>
 }

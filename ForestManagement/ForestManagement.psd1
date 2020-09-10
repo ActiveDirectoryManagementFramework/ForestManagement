@@ -27,6 +27,7 @@
 	# this module
 	RequiredModules   = @(
 		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.4.149' }
+		@{ ModuleName = 'ADMF.Core'; ModuleVersion = '1.0.0' }
 		@{ ModuleName = 'ResolveString'; ModuleVersion = '1.0.0' }
 		@{ ModuleName = 'Principal'; ModuleVersion = '1.0.0' }
 		@{ ModuleName = 'DomainManagement'; ModuleVersion = '1.3.76' }
