@@ -20,5 +20,8 @@ $script:sitelinks = @{ }
 # Schema Definition
 $script:schema = @{ }
 
+# Schema Default Permission
+$script:schemaDefaultPermissions = @{ }
+
 # Schema Definitions for external LDIF files
 $script:schemaLdif = @{ }

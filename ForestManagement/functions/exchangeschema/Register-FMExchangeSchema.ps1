@@ -65,7 +65,7 @@
 		[int]
 		$RangeUpper,
 		
-		[Parameter(Mandatory = $true, ParameterSetName = 'Details')]
+		[Parameter(ParameterSetName = 'Details')]
 		[int]
 		$ObjectVersion,
 		

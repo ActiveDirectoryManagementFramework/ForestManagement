@@ -8,6 +8,7 @@
 				<TypeName>ForestManagement.ForestLevel.TestResult</TypeName>
 				<TypeName>ForestManagement.NTAuthStore.TestResult</TypeName>
 				<TypeName>ForestManagement.Schema.TestResult</TypeName>
+				<TypeName>ForestManagement.SchemaDefaultPermission.TestResult</TypeName>
                 <TypeName>ForestManagement.SchemaLdif.TestResult</TypeName>
                 <TypeName>ForestManagement.Server.TestResult</TypeName>
                 <TypeName>ForestManagement.Site.TestResult</TypeName>
@@ -161,6 +162,45 @@
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Description</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+		
+		<!-- ForestManagement.SchemaDefaultPermission.Change -->
+        <View>
+            <Name>ForestManagement.SchemaDefaultPermission.Change</Name>
+            <ViewSelectedBy>
+                <TypeName>ForestManagement.SchemaDefaultPermission.Change</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <AutoSize/>
+                <TableHeaders>
+                    <TableColumnHeader/>
+                    <TableColumnHeader/>
+                    <TableColumnHeader/>
+                    <TableColumnHeader/>
+                    <TableColumnHeader/>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Type</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>ClassName</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Identity</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Privilege</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Access</PropertyName>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>

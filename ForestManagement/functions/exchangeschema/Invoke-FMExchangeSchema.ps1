@@ -111,7 +111,8 @@
 				}
 				
 				# Dismount Volume
-				Dismount-DiskImage -DevicePath $diskImage.DevicePath
+				try { Dismount-DiskImage -ImagePath $exchangeIsoPath }
+				catch { }
 				
 				# Report result
 				$results
