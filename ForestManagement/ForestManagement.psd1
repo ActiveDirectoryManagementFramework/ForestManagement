@@ -3,7 +3,7 @@
 	RootModule = 'ForestManagement.psm1'
 	
 	# Version number of this module.
-	ModuleVersion = '1.1.17'
+	ModuleVersion = '1.4.22'
 	
 	# ID used to uniquely identify this module
 	GUID = '7de4379d-17c8-48d3-bd6d-93279aef64bb'
@@ -27,9 +27,9 @@
 	# this module
 	RequiredModules   = @(
 		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.4.149' }
-		@{ ModuleName = 'ADMF.Core'; ModuleVersion = '1.0.0' }
 		@{ ModuleName = 'ResolveString'; ModuleVersion = '1.0.0' }
 		@{ ModuleName = 'Principal'; ModuleVersion = '1.0.0' }
+		@{ ModuleName = 'ADMF.Core'; ModuleVersion = '1.0.0' }
 		@{ ModuleName = 'DomainManagement'; ModuleVersion = '1.3.76' }
 	)
 	
