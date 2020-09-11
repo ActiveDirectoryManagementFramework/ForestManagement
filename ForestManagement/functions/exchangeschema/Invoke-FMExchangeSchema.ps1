@@ -147,7 +147,7 @@
 				#endregion Install Exchange Schema
 				
 				#region Update Exchange Schema
-				'UpdateUpdate'
+				'UpdateSchema'
 				{
 					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath))
 					{
