@@ -24,7 +24,6 @@
 	[CmdletBinding()]
 	Param (
 		[Parameter(Mandatory = $true)]
-		[ValidateSet('ntAuthStoreCertificates', 'Schema', 'SchemaLdif', 'SiteLinks', 'Sites', 'Subnets')]
 		[string]
 		$Type,
 

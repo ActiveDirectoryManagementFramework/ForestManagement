@@ -28,7 +28,7 @@ $global:MayContainCommand = @{
 	"Write-Verbose" = @()
 	"Write-Warning" = @()
 	"Write-Error"  = @()
-	"Write-Output" = @('ConvertTo-SchemaLdifPhase.ps1', 'Invoke-FMSchema.ps1', 'Invoke-FMSchemaLdif.ps1', 'Test-FMSchemaLdif.ps1')
+	"Write-Output" = @('ConvertTo-SchemaLdifPhase.ps1', 'Invoke-FMSchema.ps1', 'Invoke-FMSchemaLdif.ps1', 'Test-FMSchemaLdif.ps1', 'Invoke-FMSchemaDefaultPermission.ps1')
 	"Write-Information" = @()
 	"Write-Debug" = @()
 }
