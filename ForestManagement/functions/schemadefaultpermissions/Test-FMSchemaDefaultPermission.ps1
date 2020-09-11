@@ -23,6 +23,7 @@
 	
 		Validates, whether the contoso.com forest has the defined default permissions applied in its schema.
 #>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignments", "")]
 	[CmdletBinding()]
 	param (
 		[PSFComputer]
@@ -128,6 +129,8 @@
 			#region Utility Functions
 			function New-Change
 			{
+				[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
+				[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingEmptyCatchBlock", "")]
 				[CmdletBinding()]
 				param (
 					[Parameter(Mandatory = $true)]

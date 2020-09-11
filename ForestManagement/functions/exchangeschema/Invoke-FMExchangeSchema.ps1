@@ -63,6 +63,7 @@
 		#region Functions
 		function Test-ExchangeIsoPath
 		{
+			[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "")]
 			[CmdletBinding()]
 			param (
 				[System.Management.Automation.Runspaces.PSSession]
@@ -79,6 +80,8 @@
 		
 		function Invoke-ExchangeSchemaUpdate
 		{
+			[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingEmptyCatchBlock", "")]
+			[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "")]
 			[CmdletBinding()]
 			param (
 				[System.Management.Automation.Runspaces.PSSession]

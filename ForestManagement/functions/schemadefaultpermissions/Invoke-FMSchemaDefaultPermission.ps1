@@ -34,6 +34,8 @@
 	
 		Brings the contoso.com forest into compliance with the defined default permissions in its schema.
 #>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseUsingScopeModifierInNewRunspaces", "")]
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignments", "")]
 	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
 	Param (
 		[Parameter(ValueFromPipeline = $true)]
@@ -54,6 +56,7 @@
 		#region Utility Functions
 		function Add-AccessRule
 		{
+			[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseUsingScopeModifierInNewRunspaces", "")]
 			[CmdletBinding()]
 			param (
 				$Change,
@@ -70,10 +73,10 @@
 				$rule = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
 					[System.Security.Principal.SecurityIdentifier]$Change.Configuration.Principal,
 					$Change.Configuration.ActiveDirectoryRights,
-					$change.Configuration.AccessControlType,
-					$change.Configuration.ObjectTypeGuid,
-					$change.Configuration.InheritanceType,
-					$change.Configuration.InheritedObjectTypeGuid
+					$Change.Configuration.AccessControlType,
+					$Change.Configuration.ObjectTypeGuid,
+					$Change.Configuration.InheritanceType,
+					$Change.Configuration.InheritedObjectTypeGuid
 				)
 				$null = $acl.AddAccessRule($rule)
 			} -ErrorAction Stop
@@ -82,6 +85,8 @@
 		
 		function Remove-AccessRule
 		{
+			[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseUsingScopeModifierInNewRunspaces", "")]
+			[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
 			[CmdletBinding()]
 			param (
 				$Change,
@@ -111,6 +116,7 @@
 		
 		function Write-SchemaDefaultPermission
 		{
+			[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseUsingScopeModifierInNewRunspaces", "")]
 			[CmdletBinding()]
 			param (
 				$Session,
