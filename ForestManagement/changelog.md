@@ -1,5 +1,13 @@
 ﻿# Changelog
 
+## 1.4.22 (2020-09-11)
+
+- New: Component: Exchange Schema - manage the forest level settings of Exchange.
+- New: Component: ForestLevel - manage the forest functional level
+- New: Component: Schema Default Permissions - manage the default permissions defined in Schema
+- Fix: Unregister-FMSubnet - doesn't do a damn thing
+- Fix: Invoke-FMNTAuthStore - will now doublecheck whether certificate was correctly applied
+
 ## 1.1.17 (2020-06-19)
 
 - Fix: Test-FMSchema - tries to create defnct attributes
