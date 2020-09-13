@@ -3,7 +3,7 @@
 	RootModule = 'ForestManagement.psm1'
 	
 	# Version number of this module.
-	ModuleVersion = '1.4.22'
+	ModuleVersion = '1.4.23'
 	
 	# ID used to uniquely identify this module
 	GUID = '7de4379d-17c8-48d3-bd6d-93279aef64bb'
@@ -30,7 +30,8 @@
 		@{ ModuleName = 'ResolveString'; ModuleVersion = '1.0.0' }
 		@{ ModuleName = 'Principal'; ModuleVersion = '1.0.0' }
 		@{ ModuleName = 'ADMF.Core'; ModuleVersion = '1.0.0' }
-		@{ ModuleName = 'DomainManagement'; ModuleVersion = '1.3.76' }
+		# Dependency exists, but cannot declare it due to PS5.1 bug
+		# @{ ModuleName = 'DomainManagement'; ModuleVersion = '1.4.84' }
 	)
 	
 	# Assemblies that must be loaded prior to importing this module

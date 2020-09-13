@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.4.23 (2020-09-13)
+
+- Removed DomainManagement dependency from manifest, due to bugs in PS5.1
+
 ## 1.4.22 (2020-09-11)
 
 - New: Component: Exchange Schema - manage the forest level settings of Exchange.
