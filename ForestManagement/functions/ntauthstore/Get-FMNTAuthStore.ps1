@@ -28,7 +28,7 @@
 	)
 	
 	process {
-		$script:ntAuthStoreCertificates.Values | Where-Object Thumbprint -like $Thumbprint | Where-Object {
+		($script:ntAuthStoreCertificates.Values) | Where-Object Thumbprint -like $Thumbprint | Where-Object {
 			$_.Subject -like $Name -or
 			$_.Subject -like "CN=$Name" -or
 			$_.FriendlyName -like $Name
