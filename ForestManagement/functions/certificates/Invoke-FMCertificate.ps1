@@ -129,7 +129,7 @@
 			switch ($testResult.Type)
 			{
 				'Add' {
-					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMCertificate.Add' -ActionStringValues $testResult.Configuration.Certificate.Subject -Target $testResult -ScriptBlock {
+					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMCertificate.Add' -ActionStringValues $testResult.Configuration.Certificate.Subject, $testResult.Configuration.Type -Target $testResult -ScriptBlock {
 						$result = Invoke-Command -Session $session -ArgumentList $testResult.Configuration -ScriptBlock $addCertificateScript
 						if (-not $result.Success)
 						{
@@ -144,7 +144,7 @@
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue -ContinueLabel main
 				}
 				'Remove' {
-					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMCertificate.Remove' -ActionStringValues $testResult.ADObject.Subject -Target $testResult -ScriptBlock {
+					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMCertificate.Remove' -ActionStringValues $testResult.ADObject.Subject, $testResult.ADObject.ADObject -Target $testResult -ScriptBlock {
 						try { Set-ADObject @parameters -Identity $testResult.ADObject.ADObject -Remove @{ $testResult.ADObject.AttributeName = $testResult.ADObject.Certificate.GetRawCertData() } -ErrorAction Stop }
 						catch
 						{
