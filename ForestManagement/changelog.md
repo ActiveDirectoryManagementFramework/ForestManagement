@@ -1,7 +1,8 @@
 ﻿# Changelog
 
-## ???
+## 1.5.26 (2020-10-11)
 
+- New: Certificates Component
 - Upd: Removed most dependencies due to bug in PS5.1. Dependencies in ADMF itself are now expected to provide the necessary tools / modules.
 - Upd: Incremented PSFramework minimum version.
 
