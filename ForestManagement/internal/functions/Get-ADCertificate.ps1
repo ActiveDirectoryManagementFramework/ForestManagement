@@ -1,4 +1,4 @@
-﻿function Get-Certificate
+﻿function Get-ADCertificate
 {
 <#
 	.SYNOPSIS
@@ -15,7 +15,7 @@
 		The kind of certificate to retrieve
 	
 	.EXAMPLE
-		PS C:\> Get-Certificate -Parameters $parameters -Type NTAuthCA
+		PS C:\> Get-ADCertificate -Parameters $parameters -Type NTAuthCA
 	
 		Returns all NTAuth certificates in the targeted forest.
 #>

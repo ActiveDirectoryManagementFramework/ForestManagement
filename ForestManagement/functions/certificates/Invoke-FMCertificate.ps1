@@ -116,8 +116,6 @@
 			$InputObject = Test-FMCertificate @parameters
 		}
 		
-		$rootDSE = Get-ADRootDSE @parameters
-		
 		:main foreach ($testResult in $InputObject)
 		{
 			# Catch invalid input - can only process test results
@@ -136,7 +134,7 @@
 							throw "Error executing $($result.Stage) : $($result.Error)"
 						}
 						
-						$certificates = Get-Certificate -Parameters $parameters -Type $testResult.Configuration.Type
+						$certificates = Get-ADCertificate -Parameters $parameters -Type $testResult.Configuration.Type
 						if ($testResult.Configuration.Certificate.Thumbprint -notin $certificates.Thumbprint)
 						{
 							throw "Certificate could not be applied successfully! Ensure you have the permissions needed for this operation. Certutil output:`n$($result.Output)"

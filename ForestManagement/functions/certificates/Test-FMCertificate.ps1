@@ -35,8 +35,6 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type dsCertificates -Cmdlet $PSCmdlet
-		
-		$rootDSE = Get-ADRootDSE @parameters
 	}
 	process
 	{
@@ -47,7 +45,7 @@
 		
 		foreach ($type in 'NTAuthCA', 'RootCA', 'SubCA', 'CrossCA', 'KRA')
 		{
-			$certificates = Get-Certificate -Parameters $parameters -Type $type
+			$certificates = Get-ADCertificate -Parameters $parameters -Type $type
 			$desiredState = Get-FMCertificate -Type $type
 			
 			foreach ($desiredCert in $desiredState)
