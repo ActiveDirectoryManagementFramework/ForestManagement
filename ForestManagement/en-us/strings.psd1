@@ -23,6 +23,11 @@
 	'Invoke-Callback.Invoking.Failed'							  = 'Error executing callback: {0}' # $callback.Name
 	'Invoke-Callback.Invoking.Success'						      = 'Successfully executed callback: {0}' # $callback.Name
 	
+	'Invoke-FMCertificate.Add'								      = 'Adding {1} certificate: {0}' # $testResult.Configuration.Certificate.Subject, $testResult.Configuration.Type
+	'Invoke-FMCertificate.Invalid.Input'						  = 'Invalid input - not a valid testresult object returned by Test-FMCertificate: {0}' # $testResult
+	'Invoke-FMCertificate.Remove'								  = 'Removing certificate {0} from {1}' # $testResult.ADObject.Subject, $testResult.ADObject.ADObject
+	'Invoke-FMCertificate.WinRM.Failed'						      = 'Failed to connect to {0} via WinRM' # $computerName
+	
 	'Invoke-FMExchangeSchema.Installing'						  = 'Installing Exchange Forest settings for {0}' # $testItem.Configuration
 	'Invoke-FMExchangeSchema.IsoPath.Missing'					  = 'Cannot find the specified exchange ISO file on the target computer: {0}' # $testItem.Configuration.LocalImagePath
 	'Invoke-FMExchangeSchema.Updating'						      = 'Updating Exchange Forest settings from {0} to {1}' # $testItem.ADObject, $testItem.Configuration
@@ -40,8 +45,8 @@
 	'Invoke-FMSchema.Creating.Attribute'						  = 'Creating a new schema attribute' # 
 	'Invoke-FMSchema.Credentials.Test'						      = 'Testing ADWS connectivity to the Schema Master' # 
 	'Invoke-FMSchema.Decommission.Attribute'					  = 'Deprecating attribute {0} with ID {1}' # $testItem.ADObject.LdapDisplayName, $testItem.ADObject.AttributeID
-	'Invoke-FMSchema.Decommission.MayContain'					  = 'Removing attribute {0} from class''s { 1 } MayContain attribute' # $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName
-	'Invoke-FMSchema.Decommission.MustContain'				      = 'Removing attribute { 0 } from class''s {1} MustContain attribute' # $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName
+	'Invoke-FMSchema.Decommission.MayContain'					  = 'Removing attribute {0} from class''s {1} MayContain attribute' # $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName
+	'Invoke-FMSchema.Decommission.MustContain'				      = 'Removing attribute {0} from class''s {1} MustContain attribute' # $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName
 	'Invoke-FMSchema.Reading.ObjectClass.Failed'				  = 'Error searching for object class {0}' # $class
 	'Invoke-FMSchema.Reading.ObjectClass.NotFound'			      = 'Failed to find object class {0}' # $class
 	'Invoke-FMSchema.Rename.Attribute'						      = 'Renaming attribute {0} to {1}' # $testItem.ADObject.cn, $testItem.Configuration.Name
