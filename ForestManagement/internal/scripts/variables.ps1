@@ -1,4 +1,8 @@
-﻿# Exchange Schema Version
+﻿# Directory Certificate Stores
+$script:dsCertificates = @{ }
+$script:dsCertificatesAuthorative = @{ }
+
+# Exchange Schema Version
 $script:exchangeschema = $null
 
 # Forest Level

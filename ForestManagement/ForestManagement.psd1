@@ -3,7 +3,7 @@
 	RootModule = 'ForestManagement.psm1'
 	
 	# Version number of this module.
-	ModuleVersion = '1.4.23'
+	ModuleVersion = '1.5.26'
 	
 	# ID used to uniquely identify this module
 	GUID = '7de4379d-17c8-48d3-bd6d-93279aef64bb'
@@ -26,11 +26,12 @@
 	# Modules that must be imported into the global environment prior to importing
 	# this module
 	RequiredModules   = @(
-		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.4.149' }
-		@{ ModuleName = 'ResolveString'; ModuleVersion = '1.0.0' }
-		@{ ModuleName = 'Principal'; ModuleVersion = '1.0.0' }
-		@{ ModuleName = 'ADMF.Core'; ModuleVersion = '1.0.0' }
-		# Dependency exists, but cannot declare it due to PS5.1 bug
+		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.4.150' }
+		
+		# Additional Dependencies, cannot declare due to bug in dependency handling in PS5.1
+		# @{ ModuleName = 'ResolveString'; ModuleVersion = '1.0.0' }
+		# @{ ModuleName = 'Principal'; ModuleVersion = '1.0.0' }
+		# @{ ModuleName = 'ADMF.Core'; ModuleVersion = '1.0.0' }
 		# @{ ModuleName = 'DomainManagement'; ModuleVersion = '1.4.84' }
 	)
 	
@@ -47,6 +48,7 @@
 	FunctionsToExport = @(
 		'Clear-FMConfiguration'
 		'Get-FMCallback'
+		'Get-FMCertificate'
 		'Get-FMExchangeSchema'
 		'Get-FMForestLevel'
 		'Get-FMNTAuthStore'
@@ -56,6 +58,7 @@
 		'Get-FMSite'
 		'Get-FMSiteLink'
 		'Get-FMSubnet'
+		'Invoke-FMCertificate'
 		'Invoke-FMExchangeSchema'
 		'Invoke-FMForestLevel'
 		'Invoke-FMNTAuthStore'
@@ -67,6 +70,7 @@
 		'Invoke-FMSiteLink'
 		'Invoke-FMSubnet'
 		'Register-FMCallback'
+		'Register-FMCertificate'
 		'Register-FMExchangeSchema'
 		'Register-FMForestLevel'
 		'Register-FMNTAuthStore'
@@ -76,6 +80,7 @@
 		'Register-FMSite'
 		'Register-FMSiteLink'
 		'Register-FMSubnet'
+		'Test-FMCertificate'
 		'Test-FMExchangeSchema'
 		'Test-FMForestLevel'
 		'Test-FMNTAuthStore'
@@ -87,6 +92,7 @@
 		'Test-FMSiteLink'
 		'Test-FMSubnet'
 		'Unregister-FMCallback'
+		'Unregister-FMCertificate'
 		'Unregister-FMExchangeSchema'
 		'Unregister-FMForestLevel'
 		'Unregister-FMNTAuthStore'
