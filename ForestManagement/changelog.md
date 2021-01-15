@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.5.27 (2021-01-15)
+
+- Upd: Added configuration option to disable Schema Credential workflow when using a Credential Provider
+
 ## 1.5.26 (2020-10-11)
 
 - New: Certificates Component
