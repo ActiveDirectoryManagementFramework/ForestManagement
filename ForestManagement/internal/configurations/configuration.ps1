@@ -19,6 +19,7 @@ Set-PSFConfig -Module 'ForestManagement' -Name 'SiteLink.MultilateralLinks' -Val
 
 # Schema
 Set-PSFConfig -Module 'ForestManagement' -Name 'Schema.AutoCreate.TempAdmin' -Value $false -Initialize -Validation 'bool' -Description 'Schema Updates require special privileges not usually granted. Enabling this setting will have the task automatically create a temporary schema admin account with the permissions to execute the planned updates.'
+Set-PSFConfig -Module 'ForestManagement' -Name 'Schema.Account.IgnoreOnCredentialProvider' -Value $false -Initialize -Validation 'bool' -Description 'Whether the Schema Admin Credential workflow should be ignored when called from ADMF with the Credential Provider specified.'
 Set-PSFConfig -Module 'ForestManagement' -Name 'Schema.Account.Credential' -Value $null -Initialize -Validation credential -Description 'Credentials to use for performing schema updates'
 Set-PSFConfig -Module 'ForestManagement' -Name 'Schema.Account.Name' -Value '' -Initialize -Validation string -Description 'The name of the account to use'
 Set-PSFConfig -Module 'ForestManagement' -Name 'Schema.Account.AutoDescription' -Value '' -Initialize -Validation string -Description 'The description for the account used. If specified, this is what the description will be updated to after successfully using the account.'
