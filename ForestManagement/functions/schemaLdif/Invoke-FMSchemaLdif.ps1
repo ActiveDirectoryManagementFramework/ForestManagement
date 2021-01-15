@@ -62,11 +62,13 @@
 
 		#region Resolve Credentials
 		$cred = $null
-		Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchemaLdif.Schema.Credentials' -Target $forest.SchemaMaster -ScriptBlock {
-			[PSCredential]$cred = Get-SchemaAdminCredential @parameters | Write-Output | Select-Object -First 1
-			if ($cred) { $parameters['Credential'] = $cred }
-		} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
-		if (Test-PSFFunctionInterrupt) { return }
+		if (Test-SchemaAdminCredential) {
+			Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchemaLdif.Schema.Credentials' -Target $forest.SchemaMaster -ScriptBlock {
+				[PSCredential]$cred = Get-SchemaAdminCredential @parameters | Write-Output | Select-Object -First 1
+				if ($cred) { $parameters['Credential'] = $cred }
+			} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
+			if (Test-PSFFunctionInterrupt) { return }
+		}
 		#endregion Resolve Credentials
 
 		# Prepare parameters to use for when discarding the schema credentials
@@ -89,8 +91,10 @@
 	{
 		if (Test-PSFFunctionInterrupt) { return }
 
-		Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchemaLdif.Schema.Credentials.Release' -Target $forest.SchemaMaster -ScriptBlock {
-			Remove-SchemaAdminCredential @removeParameters -ErrorAction Stop
-		} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
+		if (Test-SchemaAdminCredential) {
+			Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchemaLdif.Schema.Credentials.Release' -Target $forest.SchemaMaster -ScriptBlock {
+				Remove-SchemaAdminCredential @removeParameters -ErrorAction Stop
+			} -EnableException $EnableException -PSCmdlet $PSCmdlet
+		}
 	}
 }

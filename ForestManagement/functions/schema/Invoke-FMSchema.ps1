@@ -64,11 +64,14 @@
 		
 		#region Resolve Credentials
 		$cred = $null
-		Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Schema.Credentials' -Target $forest.SchemaMaster -ScriptBlock {
-			[PSCredential]$cred = Get-SchemaAdminCredential @parameters | Write-Output | Select-Object -First 1
-			if ($cred) { $parameters['Credential'] = $cred }
-		} -EnableException $EnableException -PSCmdlet $PSCmdlet
-		if (Test-PSFFunctionInterrupt) { return }
+		if (Test-SchemaAdminCredential) {
+			Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Schema.Credentials' -Target $forest.SchemaMaster -ScriptBlock {
+				[PSCredential]$cred = Get-SchemaAdminCredential @parameters | Write-Output | Select-Object -First 1
+				if ($cred) { $parameters['Credential'] = $cred }
+			} -EnableException $EnableException -PSCmdlet $PSCmdlet
+			if (Test-PSFFunctionInterrupt) { return }
+		}
+		
 		$null = Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Credentials.Test' -Target $forest.SchemaMaster -ScriptBlock {
 			$null = Get-ADDomain @parameters -ErrorAction Stop
 		} -EnableException $EnableException -PSCmdlet $PSCmdlet -RetryCount 5 -RetryWait 1
@@ -176,8 +179,10 @@
 	{
 		if (Test-PSFFunctionInterrupt) { return }
 
-		Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Schema.Credentials.Release' -Target $forest.SchemaMaster -ScriptBlock {
-			$null = Remove-SchemaAdminCredential @removeParameters -ErrorAction Stop
-		} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
+		if (Test-SchemaAdminCredential) {
+			Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Schema.Credentials.Release' -Target $forest.SchemaMaster -ScriptBlock {
+				$null = Remove-SchemaAdminCredential @removeParameters -ErrorAction Stop
+			} -EnableException $EnableException -PSCmdlet $PSCmdlet
+		}
 	}
 }
