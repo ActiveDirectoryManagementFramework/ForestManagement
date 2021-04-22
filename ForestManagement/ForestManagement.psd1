@@ -77,6 +77,7 @@
 		'Register-FMSchema'
 		'Register-FMSchemaDefaultPermission'
 		'Register-FMSchemaLdif'
+        'Register-FMServer'
 		'Register-FMSite'
 		'Register-FMSiteLink'
 		'Register-FMSubnet'
