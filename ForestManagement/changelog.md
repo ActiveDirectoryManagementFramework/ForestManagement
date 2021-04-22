@@ -1,5 +1,10 @@
 ﻿# Changelog
 
+## 1.5.29 (2021-04-23)
+
+- New: Command Register-FMServer - define settings controlling server-site assignments.
+- Upd: Servers - add ability to disable automatic site assignment.
+
 ## 1.5.27 (2021-01-15)
 
 - Upd: Added configuration option to disable Schema Credential workflow when using a Credential Provider
