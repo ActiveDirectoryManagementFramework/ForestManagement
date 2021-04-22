@@ -28,6 +28,9 @@
 	
 	.PARAMETER ADObject
 		The AD Object(s) containing the actual state.
+
+    .PARAMETER Properties
+        Additional properties to include in the testresult object.
 	
 	.EXAMPLE
 		PS C:\> New-TestResult -ObjectType User -Type Changed -Identity $resolvedDN -Changed Description -Server $Server -Configuration $userDefinition -ADObject $adObject
@@ -59,12 +62,15 @@
 		
 		$Configuration,
 		
-		$ADObject
+		$ADObject,
+
+        [hashtable]
+        $Properties = @{ }
 	)
 	
 	process
 	{
-		$object = [PSCustomObject]@{
+		$object = [PSCustomObject](@{
 			PSTypeName = "ForestManagement.$ObjectType.TestResult"
 			Type	   = $Type
 			ObjectType = $ObjectType
@@ -73,7 +79,7 @@
 			Server	   = $Server
 			Configuration = $Configuration
 			ADObject   = $ADObject
-		}
+		} + $Properties)
 		Add-Member -InputObject $object -MemberType ScriptMethod -Name ToString -Value { $this.Identity } -Force
 		$object
 	}

@@ -54,20 +54,20 @@
 	process
 	{
 		:main foreach ($domainController in $domainControllers) {
+            $resultDefaults = @{
+                ObjectType = 'Server'
+                Identity = $domainController.Name
+                Server = $Server
+                ADObject = $domainController
+            }
+
+            if (-not $script:serverAutoAssignment) { continue }
+
 			#region No IP Address
 			if (-not $domainController.IPAddress) {
-				[PSCustomObject]@{
-					PSTypeName = 'ForestManagement.Server.TestResult'
-					Type = 'AddressNotFound'
-					ObjectType = 'Server'
-					Identity = $domainController.Name
-					Changed = $null
-					Server = $Server
-					CurrentSite = $domainController.SiteName
-					SupposedSite = $null
-					FoundSubnet = $null
-					ADObject = $domainController
-				}
+                New-TestResult @resultDefaults -Type AddressNotFound -Properties @{
+                    CurrentSite = $domainController.SiteName
+                }
 				continue
 			}
 			#endregion No IP Address
@@ -82,18 +82,9 @@
 			}
 
 			if (-not $foundSubnet) {
-				[PSCustomObject]@{
-					PSTypeName = 'ForestManagement.Server.TestResult'
-					Type = 'NoMatchingSubnet'
-					ObjectType = 'Server'
-					Identity = $domainController.Name
-					Changed = $null
-					Server = $Server
-					CurrentSite = $domainController.SiteName
-					SupposedSite = $null
-					FoundSubnet = $null
-					ADObject = $domainController
-				}
+                New-TestResult @resultDefaults -Type NoMatchingSubnet -Properties @{
+                    CurrentSite = $domainController.SiteName
+                }
 				continue
 			}
 			#endregion Resolving Subnet
@@ -107,19 +98,12 @@
 						continue main
 					}
 				}
-
-				[PSCustomObject]@{
-					PSTypeName = 'ForestManagement.Server.TestResult'
-					Type = 'BadSite'
-					ObjectType = 'Server'
-					Identity = $domainController.Name
-					Changed = $foundSubnet.SiteName
-					Server = $Server
-					CurrentSite = $domainController.SiteName
+                
+                New-TestResult @resultDefaults -Type BadSite -Changed $foundSubnet.SiteName -Properties @{
+                    CurrentSite = $domainController.SiteName
 					SupposedSite = $foundSubnet.SiteName
 					FoundSubnet = $foundSubnet
-					ADObject = $domainController
-				}
+                }
 			}
 		}
 	}

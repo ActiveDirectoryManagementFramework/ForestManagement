@@ -12,6 +12,9 @@ $script:forestlevel = $null
 $script:ntAuthStoreCertificates = @{ }
 $script:ntAuthStoreAuthorative = $false
 
+# Server Auto Assignment - whether domain controllers will be automatically moved to valid sites without any configuration needed
+$script:serverAutoAssignment = $true
+
 # Site Configurations
 $script:sites = @{ }
 
