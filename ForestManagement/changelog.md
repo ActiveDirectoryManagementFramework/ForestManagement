@@ -1,5 +1,10 @@
 ﻿# Changelog
 
+## ???
+
+- Upd: ExchangeSchema - added support for Split Permission mode
+- Fix: ExchangeSchema - broken invocation
+
 ## 1.5.29 (2021-04-23)
 
 - New: Command Register-FMServer - define settings controlling server-site assignments.

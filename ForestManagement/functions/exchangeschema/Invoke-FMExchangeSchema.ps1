@@ -47,7 +47,7 @@
 		$parameters['Debug'] = $false
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
-		Assert-Configuration -Type Schema -Cmdlet $PSCmdlet
+		Assert-Configuration -Type ExchangeSchema -Cmdlet $PSCmdlet
 		$forestObject = Get-ADForest @parameters
 		
 		$psParameter = $PSBoundParameters | ConvertTo-PSFHashtable -Include Credential
@@ -94,24 +94,66 @@
 				$OrganizationName,
 				
 				[switch]
-				$SchemaOnly
+				$SchemaOnly,
+
+				[ValidateSet('InstallSchema', 'UpdateSchema', 'Install', 'Update', 'EnableSplit', 'DisableSplit')]
+				[string]
+				$Mode,
+
+				[bool]
+				$SplitPermission,
+
+				[bool]
+				$AllDomains
 			)
 			
 			$result = Invoke-Command -Session $Session -ScriptBlock {
-				$exchangeIsoPath = Resolve-Path -Path $using:Path
+				param (
+					$Parameters
+				)
+				$exchangeIsoPath = Resolve-Path -Path $Parameters.Path
 				
 				# Mount Volume
 				$diskImage = Mount-DiskImage -ImagePath $exchangeIsoPath -PassThru
 				$volume = Get-Volume -DiskImage $diskImage
+				$limit = (Get-Date).AddMinutes(1)
+				while (-not $volume.DriveLetter) {
+					$volume = Get-Volume -DiskImage $diskImage
+					if ($volume.DriveLetter) { break }
+					if ((Get-Date) -gt $limit) {
+						try { Dismount-DiskImage -ImagePath $exchangeIsoPath }
+						catch { }
+						throw "Timeout waiting for volume drive letter!"
+					}
+					Start-Sleep -Milliseconds 250
+				}
 				$installPath = "$($volume.DriveLetter):\setup.exe"
 				
-				# Perform Installation
-				if ($using:SchemaOnly) { $resultText = & $installPath /IAcceptExchangeServerLicenseTerms /PrepareSchema 2>&1 }
-				else { $resultText = & $installPath /IAcceptExchangeServerLicenseTerms /PrepareAD /OrganizationName:$using:OrganizationName 2>&1 }
+				#region Perform Installation
+				$resultText = switch ($Parameters.Mode) {
+					'InstallSchema' { & $installPath /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF /PrepareSchema 2>&1 }
+					'UpdateSchema' { & $installPath /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF /PrepareSchema 2>&1 }
+					'Install' {
+						if (-not $Parameters.SplitPermission) { & $installPath /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF /PrepareAD /OrganizationName:$($Parameters.OrganizationName) 2>&1 }
+						else { & $installPath /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF /PrepareAD /ActiveDirectorySplitPermissions:true /OrganizationName:$($Parameters.OrganizationName) 2>&1 }
+					}
+					'Update' { & $installPath /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF /PrepareAD /OrganizationName:$($Parameters.OrganizationName) 2>&1 }
+					'EnableSplit' {
+						& $installPath /PrepareAD /ActiveDirectorySplitPermissions:true /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF 2>&1
+						if (-not $Parameters) { & $installPath /PrepareDomain /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF 2>&1 }
+						else { & $installPath /PrepareAllDomains /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF 2>&1 }
+					}
+					'DisableSplit' {
+						& $installPath /PrepareAD /ActiveDirectorySplitPermissions:false /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF 2>&1
+						if (-not $Parameters) { & $installPath /PrepareDomain /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF 2>&1 }
+						else { & $installPath /PrepareAllDomains /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF 2>&1 }
+					}
+				}
 				$results = [pscustomobject]@{
 					Success = $LASTEXITCODE -lt 1
 					Message = $resultText -join "`n"
 				}
+				#endregion Perform Installation
 				
 				# Dismount Volume
 				try { Dismount-DiskImage -ImagePath $exchangeIsoPath }
@@ -119,7 +161,8 @@
 				
 				# Report result
 				$results
-			}
+			} -ArgumentList ($PSBoundParameters | ConvertTo-PSFHashtable -Exclude Session)
+			Write-PSFMessage -Message ($result.Message -join "`n") -Tag exchange, result
 			if (-not $result.Success)
 			{
 				throw "Error applying exchange update: $($result.Message)"
@@ -139,12 +182,11 @@
 				#region Install Exchange Schema
 				'CreateSchema'
 				{
-					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath))
-					{
+					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Installing' -ActionStringValues $testItem.Configuration -Target $forestObject -ScriptBlock {
-						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.Configuration.OrganizationName -ErrorAction Stop -SchemaOnly
+						Invoke-ExchangeSchemaUpdate -Session $session -Mode InstallSchema -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.Configuration.OrganizationName -ErrorAction Stop -SchemaOnly
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 				}
 				#endregion Install Exchange Schema
@@ -152,12 +194,11 @@
 				#region Update Exchange Schema
 				'UpdateSchema'
 				{
-					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath))
-					{
+					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Updating' -ActionStringValues $testItem.ADObject, $testItem.Configuration -Target $forestObject -ScriptBlock {
-						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.ADObject.OrganizationName -ErrorAction Stop -SchemaOnly
+						Invoke-ExchangeSchemaUpdate -Session $session -Mode UpdateSchema -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.ADObject.OrganizationName -ErrorAction Stop -SchemaOnly
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 				}
 				#endregion Update Exchange Schema
@@ -165,12 +206,11 @@
 				#region Install Exchange Schema & AD Objects
 				'Create'
 				{
-					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath))
-					{
+					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Installing' -ActionStringValues $testItem.Configuration -Target $forestObject -ScriptBlock {
-						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.Configuration.OrganizationName -ErrorAction Stop
+						Invoke-ExchangeSchemaUpdate -Session $session -Mode Install -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.Configuration.OrganizationName -ErrorAction Stop
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 				}
 				#endregion Install Exchange Schema & AD Objects
@@ -178,15 +218,33 @@
 				#region Update Exchange Schema & AD Objects
 				'Update'
 				{
-					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath))
-					{
+					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Updating' -ActionStringValues $testItem.ADObject, $testItem.Configuration -Target $forestObject -ScriptBlock {
-						Invoke-ExchangeSchemaUpdate -Session $session -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.ADObject.OrganizationName -ErrorAction Stop
+						Invoke-ExchangeSchemaUpdate -Session $session -Mode Update -Path $testItem.Configuration.LocalImagePath -OrganizationName $testItem.ADObject.OrganizationName -ErrorAction Stop
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 				}
 				#endregion Update Exchange Schema & AD Objects
+
+				'DisableSplitP'
+				{
+					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
+						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
+					}
+					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.DisablingSplitPermissions' -ActionStringValues $testItem.Configuration -Target $Server -ScriptBlock {
+						Invoke-ExchangeSchemaUpdate -Session $session -Mode DisableSplit -AllDomains $testItem.Configuration.AllDomains -Path $testItem.Configuration.LocalImagePath -ErrorAction Stop
+					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+				}
+				'EnableSplitP'
+				{
+					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
+						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
+					}
+					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.EnablingSplitPermissions' -ActionStringValues $testItem.Configuration -Target $Server -ScriptBlock {
+						Invoke-ExchangeSchemaUpdate -Session $session -Mode EnableSplit -AllDomains $testItem.Configuration.AllDomains -Path $testItem.Configuration.LocalImagePath -ErrorAction Stop
+					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+				}
 			}
 			#endregion Apply Updates if needed
 		}
