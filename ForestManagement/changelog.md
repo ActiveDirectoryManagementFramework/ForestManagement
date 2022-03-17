@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## ???
+## 1.5.31 (2022-03-18)
 
 - Upd: ExchangeSchema - added support for Split Permission mode
 - Fix: ExchangeSchema - broken invocation
