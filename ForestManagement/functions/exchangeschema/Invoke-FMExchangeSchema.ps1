@@ -29,6 +29,7 @@
 	
 		Applies the desired Exchange version to the contoso.com Forest.
 #>
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseUsingScopeModifierInNewRunspaces', '')]
 	[CmdletBinding(SupportsShouldProcess = $true)]
 	Param (
 		[PSFComputer]
