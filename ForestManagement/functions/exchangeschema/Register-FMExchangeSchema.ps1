@@ -1,6 +1,5 @@
-﻿function Register-FMExchangeSchema
-{
-<#
+﻿function Register-FMExchangeSchema {
+	<#
 	.SYNOPSIS
 		Registers an exchange version to apply to the forest's schema and configuration.
 	
@@ -39,6 +38,18 @@
 		Whether to only apply the schema updates.
 		Enabling this will mean no configuration scope changes are applied and the root domain also will not be pre-configured for Exchange.
 	
+	.PARAMETER SplitPermission
+		Whether the exchange installation should implement Active Directory Split Permissions.
+		With Split Permissions, Exchange Administrators will be less able to affect Active Directory.
+		This provides more security, but imposes more administrative effort.
+
+		For more details on Split Permissions, see this documentation:
+		https://docs.microsoft.com/en-us/exchange/permissions/split-permissions/configure-exchange-for-split-permissions?view=exchserver-2019
+
+	.PARAMETER AllDomains
+		Whether the domain content changes to the root domain should be applied to ALL domains.
+		Only applies to the SplitPermission change.
+
 	.PARAMETER ContextName
 		The name of the context defining the setting.
 		This allows determining the configuration set that provided this setting.
@@ -74,28 +85,34 @@
 		
 		[switch]
 		$SchemaOnly,
+
+		[bool]
+		$SplitPermission = $false,
+
+		[switch]
+		$AllDomains,
 		
 		[string]
 		$ContextName = '<Undefined>'
 	)
 	
-	process
-	{
+	process {
 		$object = [pscustomobject]@{
-			PSTypeName	    = 'ForestManagement.Configuration.ExchangeSchema'
-			RangeUpper	    = $RangeUpper
-			ObjectVersion   = $ObjectVersion
-			LocalImagePath  = $LocalImagePath
-			ExchangeVersion = (Get-ExchangeVersion | Where-Object RangeUpper -eq $RangeUpper | Where-Object ObjectVersionConfig -EQ $ObjectVersion | Sort-Object Name | Select-Object -Last 1).Name
+			PSTypeName       = 'ForestManagement.Configuration.ExchangeSchema'
+			RangeUpper       = $RangeUpper
+			ObjectVersion    = $ObjectVersion
+			LocalImagePath   = $LocalImagePath
+			ExchangeVersion  = (Get-AdcExchangeVersion | Where-Object RangeUpper -EQ $RangeUpper | Where-Object ObjectVersionConfig -EQ $ObjectVersion | Sort-Object Name | Select-Object -Last 1).Name
 			OrganizationName = $OrganizationName
-			SchemaOnly	    = $SchemaOnly.ToBool()
-			ContextName	    = $ContextName
+			SchemaOnly       = $SchemaOnly.ToBool()
+			SplitPermission  = $SplitPermission
+			AllDomains       = $AllDomains
+			ContextName      = $ContextName
 		}
 		
-		if ($ExchangeVersion)
-		{
+		if ($ExchangeVersion) {
 			# Will always succeede, since the input validation prevents invalid exchange versions
-			$exchangeVersionInfo = Get-ExchangeVersion -Binding $ExchangeVersion
+			$exchangeVersionInfo = Get-AdcExchangeVersion -Binding $ExchangeVersion
 			$object.RangeUpper = $exchangeVersionInfo.RangeUpper
 			$object.ObjectVersion = $exchangeVersionInfo.ObjectVersionConfig
 			$object.ExchangeVersion = $exchangeVersionInfo.Name
