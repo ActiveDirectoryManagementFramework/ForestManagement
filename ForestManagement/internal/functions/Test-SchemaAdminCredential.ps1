@@ -15,6 +15,7 @@
 
 		Validates, whether the schema admin credential workflow should be executed.
 	#>
+	[OutputType([bool])]
 	[CmdletBinding()]
 	param ()
 
