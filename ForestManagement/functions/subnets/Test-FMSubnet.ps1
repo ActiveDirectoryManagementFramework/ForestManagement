@@ -42,6 +42,9 @@
 	}
 	process
 	{
+		#TODO: Migrate to New-TestResult
+		#TODO: Change Test Result Codes to imperative
+
 		#region Test all Subnets found in the forest
 		foreach ($subnetItem in $allSubnets) {
 			if ($script:subnets.Keys -notcontains $subnetItem.Name) {

@@ -45,6 +45,8 @@
 	{
 		$parameters = $PSBoundParameters | ConvertTo-PSFHashtable -Include Server, Credential
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
+
+		#TODO: Implement pipeline support
 		$testResult = Test-FMServer @parameters
 	}
 	process

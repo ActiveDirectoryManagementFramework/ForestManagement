@@ -78,6 +78,7 @@
 		if (Test-PSFFunctionInterrupt) { return }
 		#endregion Resolve Credentials
 
+		#TODO: Add pipeline support
 		$testResult = Test-FMSchema @parameters
 
 		# Prepare parameters to use for when discarding the schema credentials

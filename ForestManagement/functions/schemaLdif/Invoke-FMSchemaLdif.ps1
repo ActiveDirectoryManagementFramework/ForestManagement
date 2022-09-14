@@ -74,6 +74,7 @@
 		# Prepare parameters to use for when discarding the schema credentials
 		if ($cred -and ($cred -ne $Credential)) { $removeParameters['SchemaAccountCredential'] = $cred }
 
+		#TODO: Add pipeline support
 		# Grab test results to get list of items to process
 		$testResult = Test-FMSchemaLdif @parameters -EnableException:$EnableException
 	}

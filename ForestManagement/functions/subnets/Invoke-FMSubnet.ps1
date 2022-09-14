@@ -57,6 +57,7 @@
 	}
 	process
 	{
+		#TODO: Implement Pipeline Support
 		foreach ($testItem in $testResult) {
 			switch ($testItem.Type) {
 				'ForestOnly' {

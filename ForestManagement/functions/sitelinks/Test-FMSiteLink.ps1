@@ -37,6 +37,8 @@
 		Assert-Configuration -Type SiteLinks -Cmdlet $PSCmdlet
 		$allSiteLinks = Get-ADReplicationSiteLink @parameters -Filter * -Properties Cost,Description, Options, Name, replInterval, siteList | Select-Object *
 		$linksToExclude = @()
+
+		#TODO: Rationalize to New-TestResult
 		foreach ($siteLink in $allSiteLinks) {
 			$count = 1
 			foreach ($site in $siteLink.siteList) {

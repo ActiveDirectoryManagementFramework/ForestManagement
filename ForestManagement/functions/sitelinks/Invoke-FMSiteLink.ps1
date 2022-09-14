@@ -45,6 +45,7 @@
 	{
 		$parameters = $PSBoundParameters | ConvertTo-PSFHashtable -Include Server, Credential
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
+		#TODO: Implement Pipeline Support
 		$testResult = Test-FMSiteLink @parameters
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type SiteLinks -Cmdlet $PSCmdlet

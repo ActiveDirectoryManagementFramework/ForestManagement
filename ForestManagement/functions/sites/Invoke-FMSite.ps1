@@ -51,6 +51,7 @@
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type Sites -Cmdlet $PSCmdlet
 		$testResult = Test-FMSite @parameters
+		#TODO: Add Pipeline support
 	}
 	process
 	{
