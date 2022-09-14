@@ -7,6 +7,10 @@
 		.DESCRIPTION
 			Corrects the subnet configuration of a forest.
 		
+		.PARAMETER InputObject
+			Test results provided by the associated test command.
+			Only the provided changes will be executed, unless none were specified, in which ALL pending changes will be executed.
+		
 		.PARAMETER Server
 			The server / domain to work with.
 		
@@ -30,6 +34,9 @@
 	#>
 	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
 	Param (
+		[Parameter(ValueFromPipeline = $true)]
+		$InputObject,
+		
 		[PSFComputer]
 		$Server,
 
@@ -47,17 +54,21 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type Subnets -Cmdlet $PSCmdlet
-		$testResult = Test-FMSubnet @parameters | Sort-Object {
+	}
+	process
+	{
+		if (-not $InputObject) {
+			$InputObject = Test-FMSubnet @parameters
+		}
+
+		$testResult = $InputObject | Sort-Object {
 			switch ($_.Type) {
 				'ForestOnly' { 1 }
 				'InEqual' { 2 }
 				default { 3 }
 			}
 		}
-	}
-	process
-	{
-		#TODO: Implement Pipeline Support
+
 		foreach ($testItem in $testResult) {
 			switch ($testItem.Type) {
 				'ForestOnly' {

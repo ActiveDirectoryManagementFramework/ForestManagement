@@ -8,6 +8,10 @@
 			Adjusts the targeted forest to comply with the site configuration.
 			Use Register-FMSiteConfiguration to register configuration settings.
 		
+		.PARAMETER InputObject
+			Test results provided by the associated test command.
+			Only the provided changes will be executed, unless none were specified, in which ALL pending changes will be executed.
+		
 		.PARAMETER Server
 			The server / domain to work with.
 		
@@ -33,6 +37,9 @@
 	
 	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
 	Param (
+		[Parameter(ValueFromPipeline = $true)]
+		$InputObject,
+		
 		[PSFComputer]
 		$Server,
 
@@ -50,12 +57,14 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type Sites -Cmdlet $PSCmdlet
-		$testResult = Test-FMSite @parameters
-		#TODO: Add Pipeline support
 	}
 	process
 	{
-		foreach ($testItem in $testResult) {
+		if (-not $InputObject) {
+			$InputObject = Test-FMSite @parameters
+		}
+
+		foreach ($testItem in $InputObject) {
 			switch ($testItem.Type) {
 				'ForestOnly' {
 					$siteObject = Get-ADReplicationSite @parameters -Identity $testItem.Name

@@ -7,6 +7,10 @@
 		.DESCRIPTION
 			Applies missing LDIF files to a forest's schema.
 		
+		.PARAMETER InputObject
+			Test results provided by the associated test command.
+			Only the provided changes will be executed, unless none were specified, in which ALL pending changes will be executed.
+		
 		.PARAMETER Server
 			The server / domain to work with.
 		
@@ -31,6 +35,9 @@
 	
 	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
 	Param (
+		[Parameter(ValueFromPipeline = $true)]
+		$InputObject,
+		
 		[PSFComputer]
 		$Server,
 
@@ -73,16 +80,16 @@
 
 		# Prepare parameters to use for when discarding the schema credentials
 		if ($cred -and ($cred -ne $Credential)) { $removeParameters['SchemaAccountCredential'] = $cred }
-
-		#TODO: Add pipeline support
-		# Grab test results to get list of items to process
-		$testResult = Test-FMSchemaLdif @parameters -EnableException:$EnableException
 	}
 	process
 	{
 		if (Test-PSFFunctionInterrupt) { return }
 
-		foreach ($testItem in $testResult) {
+		if (-not $InputObject) {
+			$InputObject = Test-FMSchemaLdif @parameters -EnableException:$EnableException
+		}
+
+		foreach ($testItem in $InputObject) {
 			Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchemaLdif.Invoke.File' -ActionStringValues $testItem.Identity -Target $forest.SchemaMaster -ScriptBlock {
 				Invoke-LdifFile @parameters -Path $testItem.Configuration.Path -ErrorAction Stop
 			} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet -Continue

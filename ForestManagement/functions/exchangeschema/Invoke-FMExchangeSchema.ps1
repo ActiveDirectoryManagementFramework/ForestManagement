@@ -8,6 +8,10 @@
 		Applies the desired Exchange version to the tareted Forest.
 		Requires Schema Admin & Enterprise Admin privileges.
 	
+	.PARAMETER InputObject
+		Test results provided by the associated test command.
+		Only the provided changes will be executed, unless none were specified, in which ALL pending changes will be executed.
+	
 	.PARAMETER Server
 		The server / domain to work with.
 		
@@ -32,6 +36,9 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseUsingScopeModifierInNewRunspaces', '')]
 	[CmdletBinding(SupportsShouldProcess = $true)]
 	Param (
+		[Parameter(ValueFromPipeline = $true)]
+		$InputObject,
+		
 		[PSFComputer]
 		$Server,
 		
@@ -174,8 +181,12 @@
 	process
 	{
 		if (Test-PSFFunctionInterrupt) { return }
-		#TODO: Implement Pipeline Input
-		foreach ($testItem in Test-FMExchangeSchema @parameters)
+
+		if (-not $InputObject) {
+			$InputObject = Test-FMExchangeSchema @parameters
+		}
+
+		foreach ($testItem in $InputObject)
 		{
 			#region Apply Updates if needed
 			switch ($testItem.Type)

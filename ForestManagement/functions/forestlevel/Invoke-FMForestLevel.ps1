@@ -7,6 +7,10 @@
 	.DESCRIPTION
 		Applies the desired forest level if needed.
 	
+	.PARAMETER InputObject
+		Test results provided by the associated test command.
+		Only the provided changes will be executed, unless none were specified, in which ALL pending changes will be executed.
+	
 	.PARAMETER Server
 		The server / domain to work with.
 		
@@ -30,6 +34,9 @@
 #>
 	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
 	param (
+		[Parameter(ValueFromPipeline = $true)]
+		$InputObject,
+		
 		[PSFComputer]
 		$Server,
 		
@@ -50,8 +57,11 @@
 	}
 	process
 	{
-		#TODO: Implement Pipeline Input
-		foreach ($testItem in Test-FMForestLevel @parameters)
+		if (-not $InputObject) {
+			$InputObject = Test-FMForestLevel @parameters
+		}
+
+		foreach ($testItem in $InputObject)
 		{
 			switch ($testItem.Type)
 			{

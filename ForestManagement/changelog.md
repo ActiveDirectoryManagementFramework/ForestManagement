@@ -1,5 +1,19 @@
 ﻿# Changelog
 
+## ???
+
+- Upd: ExchangeSchema - added support for pipeline input for invocation
+- Upd: Forest Level - added support for pipeline input for invocation
+- Upd: Schema - added support for pipeline input for invocation
+- Upd: SchemaLdif - added support for pipeline input for invocation
+- Upd: Server - added support for pipeline input for invocation
+- Upd: SiteLink - added support for pipeline input for invocation
+- Upd: SiteLink - renamed change actions to Create, Update and Delete
+- Upd: SiteLink - renamed information actions to MultipleSites, TooManySites
+- Upd: SiteLink - added actionable information to the Changed property of the test result
+- Upd: Sites - added support for pipeline input for invocation
+- Upd: Subnet - added support for pipeline input for invocation
+
 ## 1.5.31 (2022-03-18)
 
 - Upd: ExchangeSchema - added support for Split Permission mode
