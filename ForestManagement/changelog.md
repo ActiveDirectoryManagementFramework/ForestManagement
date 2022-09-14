@@ -12,7 +12,11 @@
 - Upd: SiteLink - renamed information actions to MultipleSites, TooManySites
 - Upd: SiteLink - added actionable information to the Changed property of the test result
 - Upd: Sites - added support for pipeline input for invocation
+- Upd: Sites - renamed change actions to Create, Update, Rename and Delete
+- Upd: Sites - added actionable information to the Changed property of the test result
 - Upd: Subnet - added support for pipeline input for invocation
+- Upd: Subnet - renamed change actions to Create, Update and Delete
+- Upd: Subnet - added actionable information to the Changed property of the test result
 
 ## 1.5.31 (2022-03-18)
 

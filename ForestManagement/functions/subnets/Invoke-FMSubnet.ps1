@@ -71,23 +71,24 @@
 
 		foreach ($testItem in $testResult) {
 			switch ($testItem.Type) {
-				'ForestOnly' {
+				'Delete' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSubnet.Deleting.Subnet' -Target $testItem.Name -ScriptBlock {
 						Remove-ADReplicationSubnet @parameters -Identity $testItem.Name -ErrorAction Stop -Confirm:$false
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
 				}
-				'ConfigurationOnly' {
+				'Create' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSubnet.Creating.Subnet' -Target $testItem.Name -ScriptBlock {
 						New-ADReplicationSubnet @parameters -Name $testItem.Name -Site $testItem.SiteName -Description $testItem.Description -Location $testItem.Location -ErrorAction Stop
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
 				}
-				'InEqual' {
+				'Update' {
 					$parametersSetSplat = $parameters.Clone()
 					$parametersSetSplat['Identity'] = $testItem.Identity
-					if ($testItem.SiteName -ne $testItem.ADObject.SiteName) { $parametersSetSplat['Site'] = $testItem.SiteName }
-					if ($testItem.Description -ne ([string]($testItem.ADObject.Description))) { $parametersSetSplat['Description'] = $testItem.Description }
-					if ($testItem.Location -ne ([string]($testItem.ADObject.Location))) { $parametersSetSplat['Location'] = $testItem.Location }
 
+					foreach ($change in $testItem.Changed) {
+						$parametersSetSplat[$change.Property] = $change.NewValue
+					}
+					
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSubnet.Updating.Subnet' -ActionStringValues ($testItem.Changed -join ", ") -Target $testItem.Name -ScriptBlock {
 						Set-ADReplicationSubnet @parametersSetSplat -ErrorAction Stop
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet

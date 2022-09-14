@@ -66,7 +66,7 @@
 
 		foreach ($testItem in $InputObject) {
 			switch ($testItem.Type) {
-				'ForestOnly' {
+				'Delete' {
 					$siteObject = Get-ADReplicationSite @parameters -Identity $testItem.Name
 					$servers = Get-ADObject @parameters -LDAPFilter '(objectClass=server)' -SearchBase $siteObject.DistinguishedName
 					if ($servers) {
@@ -78,17 +78,17 @@
 						} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
 					}
 				}
-				'ConfigurationOnly' {
+				'Create' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSite.Creating.Site' -Target $testItem.Name -ScriptBlock {
 						New-ADReplicationSite @parameters -Name $testItem.Name -Description $testItem.Description -OtherAttributes @{ Location = $testItem.Location } -ErrorAction Stop
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
 				}
-				'InEqual' {
+				'Update' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSite.Updating.Site' -ActionStringValues ($testItem.Changed -join ", ") -Target $testItem.Name -ScriptBlock {
 						Set-ADReplicationSite @parameters -Identity $testItem.Name -Description $testItem.Description -Replace @{ Location = $testItem.Location } -ErrorAction Stop
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
 				}
-				'RenamePending' {
+				'Rename' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSite.Renaming.Site' -ActionStringValues $testItem.NewName -Target $testItem.Name -ScriptBlock {
 						Get-ADReplicationSite @parameters -Identity $testItem.Name | Rename-ADObject @parameters -NewName $testItem.NewName
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet

@@ -43,7 +43,7 @@
 
 			$datum = [PSCustomObject]@{
 				PSTypeName = 'ForestManagement.SiteLink.Update'
-				Identity = $SiteLink.Name
+				Identity = $Identity
 				Property = $Property
 				OldValue = $OldValue
 				NewValue = $NewValue
