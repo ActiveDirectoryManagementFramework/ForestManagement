@@ -1,5 +1,4 @@
-﻿function Invoke-FMSiteLink
-{
+﻿function Invoke-FMSiteLink {
 	<#
 		.SYNOPSIS
 			Update a forest's sitelink to conform to the defined configuration.
@@ -7,6 +6,10 @@
 		.DESCRIPTION
 			Update a forest's sitelink to conform to the defined configuration.
 			Configuration is defined using Register-FMSiteLink.
+		
+		.PARAMETER InputObject
+			Test results provided by the associated test command.
+			Only the provided changes will be executed, unless none were specified, in which ALL pending changes will be executed.
 		
 		.PARAMETER Server
 			The server / domain to work with.
@@ -31,6 +34,9 @@
 	#>
 	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
 	Param (
+		[Parameter(ValueFromPipeline = $true)]
+		$InputObject,
+		
 		[PSFComputer]
 		$Server,
 
@@ -41,20 +47,21 @@
 		$EnableException
 	)
 	
-	begin
-	{
+	begin {
 		$parameters = $PSBoundParameters | ConvertTo-PSFHashtable -Include Server, Credential
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
-		$testResult = Test-FMSiteLink @parameters
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type SiteLinks -Cmdlet $PSCmdlet
 	}
-	process
-	{
-		foreach ($testItem in $testResult) {
+	process {
+		if (-not $InputObject) {
+			$InputObject = Test-FMSiteLink @parameters
+		}
+		
+		foreach ($testItem in $InputObject) {
 			switch ($testItem.Type) {
 				#region Delete undesired Sitelink
-				'ForestOnly' {
+				'Delete' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSiteLink.Removing.SiteLink' -Target $testItem.Name -ScriptBlock {
 						Remove-ADReplicationSiteLink @parameters -Identity $testItem.Name -ErrorAction Stop -Confirm:$false
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
@@ -62,16 +69,16 @@
 				#endregion Delete undesired Sitelink
 
 				#region Create new Sitelink
-				'ConfigurationOnly' {
+				'Create' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSiteLink.Creating.SiteLink' -Target $testItem.Name -ScriptBlock {
 						$parametersCreate = $parameters.Clone()
 						$parametersCreate += @{
-							ErrorAction = 'Stop'
-							Name = $testItem.Name
-							Description = $testItem.Description
-							Cost = $testItem.Cost
+							ErrorAction                   = 'Stop'
+							Name                          = $testItem.Name
+							Description                   = $testItem.Description
+							Cost                          = $testItem.Cost
 							ReplicationFrequencyInMinutes = $testItem.ReplicationInterval
-							SitesIncluded = $testItem.Site1, $testItem.Site2
+							SitesIncluded                 = $testItem.Site1, $testItem.Site2
 						}
 						if ($testItem.Options) { $parametersCreate['OtherAttributes'] = @{ Options = $testItem.Options } }
 						New-ADReplicationSiteLink @parametersCreate
@@ -80,7 +87,7 @@
 				#endregion Create new Sitelink
 
 				#region Update existing Sitelink
-				'InEqual' {
+				'Update' {
 					if ($testItem.ADObject.Name -ne $testItem.IdealName) {
 						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSiteLink.Renaming.SiteLink' -ActionStringValues $testItem.IdealName -Target $testItem.Name -ScriptBlock {
 							Rename-ADObject @parameters -Identity $testItem.ADObject.DistinguishedName -NewName $testItem.IdealName -ErrorAction Stop
@@ -90,12 +97,16 @@
 					$parametersUpdate = $parameters.Clone()
 					$parametersUpdate += @{
 						ErrorAction = 'Stop'
-						Identity = $testItem.ADObject.ObjectGUID
+						Identity    = $testItem.ADObject.ObjectGUID
 					}
-					if ($testItem.Cost -ne $testItem.ADObject.Cost) { $parametersUpdate['Cost'] = $testItem.Cost }
-					if ($testItem.Description -ne ([string]($testItem.ADObject.Description))) { $parametersUpdate['Description'] = $testItem.Description }
-					if ($testItem.Options -ne ([int]($testItem.ADObject.Options))) { $parametersUpdate['Replace'] = @{ Options = $testItem.Options } }
-					if ($testItem.ReplicationInterval -ne $testItem.ADObject.replInterval) { $parametersUpdate['ReplicationFrequencyInMinutes'] = $testItem.replInterval }
+					foreach ($change in $testItem.Changed) {
+						switch ($change.Property) {
+							'Cost' { $parametersUpdate['Cost'] = $change.NewValue }
+							'Description' { $parametersUpdate['Description'] = $change.NewValue }
+							'Options' { $parametersUpdate['Replace'] = @{ Options = $change.NewValue } }
+							'ReplicationInterval' { $parametersUpdate['ReplicationFrequencyInMinutes'] = $change.NewValue }
+						}
+					}
 
 					# If the only change pending was the name, don't call a meaningles Set-ADReplicationSiteLink
 					if ($parametersUpdate.Keys.Count -le (2 + $parameters.Keys.Count)) { continue }

@@ -7,6 +7,10 @@
 	.DESCRIPTION
 		Ensures domain controllers are assigned to sites suitable for their IP addresses.
 	
+	.PARAMETER InputObject
+		Test results provided by the associated test command.
+		Only the provided changes will be executed, unless none were specified, in which ALL pending changes will be executed.
+	
 	.PARAMETER Server
 		The server / domain to work with.
 	
@@ -31,6 +35,9 @@
 	
 	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
 	Param (
+		[Parameter(ValueFromPipeline = $true)]
+		$InputObject,
+		
 		[PSFComputer]
 		$Server,
 
@@ -45,11 +52,14 @@
 	{
 		$parameters = $PSBoundParameters | ConvertTo-PSFHashtable -Include Server, Credential
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
-		$testResult = Test-FMServer @parameters
 	}
 	process
 	{
-		foreach ($testItem in $testResult) {
+		if (-not $InputObject) {
+			$InputObject = Test-FMServer @parameters
+		}
+
+		foreach ($testItem in $InputObject) {
 			switch ($testItem.Type) {
 				'AddressNotFound'
 				{

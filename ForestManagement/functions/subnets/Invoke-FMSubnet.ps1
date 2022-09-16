@@ -7,6 +7,10 @@
 		.DESCRIPTION
 			Corrects the subnet configuration of a forest.
 		
+		.PARAMETER InputObject
+			Test results provided by the associated test command.
+			Only the provided changes will be executed, unless none were specified, in which ALL pending changes will be executed.
+		
 		.PARAMETER Server
 			The server / domain to work with.
 		
@@ -30,6 +34,9 @@
 	#>
 	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
 	Param (
+		[Parameter(ValueFromPipeline = $true)]
+		$InputObject,
+		
 		[PSFComputer]
 		$Server,
 
@@ -47,35 +54,41 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type Subnets -Cmdlet $PSCmdlet
-		$testResult = Test-FMSubnet @parameters | Sort-Object {
+	}
+	process
+	{
+		if (-not $InputObject) {
+			$InputObject = Test-FMSubnet @parameters
+		}
+
+		$testResult = $InputObject | Sort-Object {
 			switch ($_.Type) {
 				'ForestOnly' { 1 }
 				'InEqual' { 2 }
 				default { 3 }
 			}
 		}
-	}
-	process
-	{
+
 		foreach ($testItem in $testResult) {
 			switch ($testItem.Type) {
-				'ForestOnly' {
+				'Delete' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSubnet.Deleting.Subnet' -Target $testItem.Name -ScriptBlock {
 						Remove-ADReplicationSubnet @parameters -Identity $testItem.Name -ErrorAction Stop -Confirm:$false
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
 				}
-				'ConfigurationOnly' {
+				'Create' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSubnet.Creating.Subnet' -Target $testItem.Name -ScriptBlock {
 						New-ADReplicationSubnet @parameters -Name $testItem.Name -Site $testItem.SiteName -Description $testItem.Description -Location $testItem.Location -ErrorAction Stop
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
 				}
-				'InEqual' {
+				'Update' {
 					$parametersSetSplat = $parameters.Clone()
 					$parametersSetSplat['Identity'] = $testItem.Identity
-					if ($testItem.SiteName -ne $testItem.ADObject.SiteName) { $parametersSetSplat['Site'] = $testItem.SiteName }
-					if ($testItem.Description -ne ([string]($testItem.ADObject.Description))) { $parametersSetSplat['Description'] = $testItem.Description }
-					if ($testItem.Location -ne ([string]($testItem.ADObject.Location))) { $parametersSetSplat['Location'] = $testItem.Location }
 
+					foreach ($change in $testItem.Changed) {
+						$parametersSetSplat[$change.Property] = $change.NewValue
+					}
+					
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSubnet.Updating.Subnet' -ActionStringValues ($testItem.Changed -join ", ") -Target $testItem.Name -ScriptBlock {
 						Set-ADReplicationSubnet @parametersSetSplat -ErrorAction Stop
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet

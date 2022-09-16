@@ -8,6 +8,10 @@
 			Adjusts the targeted forest to comply with the site configuration.
 			Use Register-FMSiteConfiguration to register configuration settings.
 		
+		.PARAMETER InputObject
+			Test results provided by the associated test command.
+			Only the provided changes will be executed, unless none were specified, in which ALL pending changes will be executed.
+		
 		.PARAMETER Server
 			The server / domain to work with.
 		
@@ -33,6 +37,9 @@
 	
 	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
 	Param (
+		[Parameter(ValueFromPipeline = $true)]
+		$InputObject,
+		
 		[PSFComputer]
 		$Server,
 
@@ -50,13 +57,16 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type Sites -Cmdlet $PSCmdlet
-		$testResult = Test-FMSite @parameters
 	}
 	process
 	{
-		foreach ($testItem in $testResult) {
+		if (-not $InputObject) {
+			$InputObject = Test-FMSite @parameters
+		}
+
+		foreach ($testItem in $InputObject) {
 			switch ($testItem.Type) {
-				'ForestOnly' {
+				'Delete' {
 					$siteObject = Get-ADReplicationSite @parameters -Identity $testItem.Name
 					$servers = Get-ADObject @parameters -LDAPFilter '(objectClass=server)' -SearchBase $siteObject.DistinguishedName
 					if ($servers) {
@@ -68,17 +78,17 @@
 						} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
 					}
 				}
-				'ConfigurationOnly' {
+				'Create' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSite.Creating.Site' -Target $testItem.Name -ScriptBlock {
 						New-ADReplicationSite @parameters -Name $testItem.Name -Description $testItem.Description -OtherAttributes @{ Location = $testItem.Location } -ErrorAction Stop
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
 				}
-				'InEqual' {
+				'Update' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSite.Updating.Site' -ActionStringValues ($testItem.Changed -join ", ") -Target $testItem.Name -ScriptBlock {
 						Set-ADReplicationSite @parameters -Identity $testItem.Name -Description $testItem.Description -Replace @{ Location = $testItem.Location } -ErrorAction Stop
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
 				}
-				'RenamePending' {
+				'Rename' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSite.Renaming.Site' -ActionStringValues $testItem.NewName -Target $testItem.Name -ScriptBlock {
 						Get-ADReplicationSite @parameters -Identity $testItem.Name | Rename-ADObject @parameters -NewName $testItem.NewName
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet
