@@ -30,6 +30,7 @@
 	begin {
 		#region Functions
 		function New-Update {
+			[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
 			[CmdletBinding()]
 			param (
 				$Identity,

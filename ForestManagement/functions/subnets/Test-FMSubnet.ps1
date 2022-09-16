@@ -30,6 +30,7 @@
 	begin {
 		#region Functions
 		function New-Update {
+			[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "")]
 			[CmdletBinding()]
 			param (
 				$Identity,
@@ -66,9 +67,6 @@
 		}
 	}
 	process {
-		#TODO: Migrate to New-TestResult
-		#TODO: Change Test Result Codes to imperative
-
 		$resultDefaults = @{
 			ObjectType = 'Subnet'
 			Server     = $Server
