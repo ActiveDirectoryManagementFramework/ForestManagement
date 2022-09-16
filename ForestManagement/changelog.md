@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## ???
+## 1.5.46 (2022-09-16)
 
 - Upd: ExchangeSchema - added support for pipeline input for invocation
 - Upd: Forest Level - added support for pipeline input for invocation
