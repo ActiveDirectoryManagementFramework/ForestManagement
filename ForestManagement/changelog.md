@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## ???
+
+- Fix: SchemaLdif - "Argument is null or empty" error when using an account with the `<name>@<domain>` format
+
 ## 1.5.46 (2022-09-16)
 
 - Upd: ExchangeSchema - added support for pipeline input for invocation
