@@ -60,10 +60,11 @@
 			if (-not $schemaObject) {
 				# If we already want to disable the attribute, no need to create it
 				if ($schemaSetting.IsDefunct) { continue }
+				if ($schemaSetting.Optional) { continue }
 
 				[PSCustomObject]@{
 					PSTypeName    = 'ForestManagement.Schema.TestResult'
-					Type          = 'ConfigurationOnly'
+					Type          = 'Create'
 					ObjectType    = 'Schema'
 					Identity      = $schemaSetting.AdminDisplayName
 					Changed       = $null
@@ -100,46 +101,52 @@
 				}
 			}
 
-			$isEqual = $true
-			$deltaProperties = @()
-			
-			if ($schemaSetting.OMSyntax -ne $schemaObject.oMSyntax) { $isEqual = $false; $deltaProperties += 'OMSyntax' }
-			if ($schemaSetting.AttributeSyntax -ne $schemaObject.attributeSyntax) { $isEqual = $false; $deltaProperties += 'AttributeSyntax' }
-			if ($schemaSetting.SingleValued -ne $schemaObject.isSingleValued) { $isEqual = $false; $deltaProperties += 'SingleValued' }
-			if ($schemaSetting.AdminDescription -cne $schemaObject.adminDescription) { $isEqual = $false; $deltaProperties += 'AdminDescription' }
-			if ($schemaSetting.AdminDisplayName -cne $schemaObject.adminDisplayName) { $isEqual = $false; $deltaProperties += 'AdminDisplayName' }
-			if ($schemaSetting.LdapDisplayName -cne $schemaObject.ldapDisplayName) { $isEqual = $false; $deltaProperties += 'LdapDisplayName' }
-			if ($schemaSetting.SearchFlags -ne $schemaObject.searchflags) { $isEqual = $false; $deltaProperties += 'SearchFlags' }
-			if ($schemaSetting.PartialAttributeSet -ne $schemaObject.isMemberOfPartialAttributeSet) { $isEqual = $false; $deltaProperties += 'PartialAttributeSet' }
-			if ($schemaSetting.AdvancedView -ne $schemaObject.showInAdvancedViewOnly) { $isEqual = $false; $deltaProperties += 'AdvancedView' }
-			if (-not $schemaSetting.IsDefunct -and $schemaObject.isDefunct) { $isEqual = $false; $deltaProperties += 'IsDefunct' }
+			$changes = [System.Collections.ArrayList]@()
 
-			if (-not $schemaSetting.IsDefunct) {
+			$param = @{
+				Configuration = $schemaSetting
+				ADObject      = $schemaObject
+				CaseSensitive = $true
+				IfExists      = $true
+				Changes       = $changes
+				Type          = 'Schema'
+			}
+			Compare-AdcProperty @param -Property oMSyntax
+			Compare-AdcProperty @param -Property attributeSyntax
+			Compare-AdcProperty @param -Property SingleValued -ADProperty isSingleValued
+			Compare-AdcProperty @param -Property adminDescription
+			Compare-AdcProperty @param -Property adminDisplayName
+			Compare-AdcProperty @param -Property ldapDisplayName
+			Compare-AdcProperty @param -Property searchflags
+			Compare-AdcProperty @param -Property PartialAttributeSet -ADProperty isMemberOfPartialAttributeSet
+			Compare-AdcProperty @param -Property AdvancedView -ADProperty showInAdvancedViewOnly
+			if (-not $schemaSetting.IsDefunct -and $schemaObject.isDefunct) {
+				Compare-AdcProperty @param -Property isDefunct
+			}
+
+			if (-not $schemaSetting.IsDefunct -and $schemaSetting.PSObject.Properties.Name -contains 'Objectclass') {
 				$mayContain = Get-ADObject @parameters -LDAPFilter "(mayContain=$($schemaSetting.LdapDisplayName))" -SearchBase $rootDSE.schemaNamingContext
 				if (-not $mayContain -and $schemaSetting.ObjectClass) {
-					$isEqual = $false
-					$deltaProperties += 'ObjectClass'
+					$null = $changes.Add((New-AdcChange -Property ObjectClass -NewValue $schemaSetting.ObjectClass -Identity $schemaObject.DistinguishedName -Type Schema))
 				}
 				elseif ($mayContain.Name -and -not $schemaSetting.ObjectClass) {
-					$isEqual = $false
-					$deltaProperties += 'ObjectClass'
+					$null = $changes.Add((New-AdcChange -Property ObjectClass -OldValue $mayContain.Name -Identity $schemaObject.DistinguishedName -Type Schema))
 				}
 				elseif (-not $mayContain.Name -and -not $schemaSetting.ObjectClass) {
 					# Nothing wrong here
 				}
 				elseif ($mayContain.Name | Compare-Object $schemaSetting.ObjectClass) {
-					$isEqual = $false
-					$deltaProperties += 'ObjectClass'
+					$null = $changes.Add((New-AdcChange -Property ObjectClass -OldValue $mayContain.Name -NewValue $schemaSetting.ObjectClass -Identity $schemaObject.DistinguishedName -Type Schema))
 				}
 			}
 
-			if (-not $isEqual) {
+			if ($changes.Count -gt 0) {
 				[PSCustomObject]@{
 					PSTypeName    = 'ForestManagement.Schema.TestResult'
-					Type          = 'InEqual'
+					Type          = 'Update'
 					ObjectType    = 'Schema'
 					Identity      = $schemaSetting.AdminDisplayName
-					Changed       = $deltaProperties
+					Changed       = $changes.ToArray()
 					Server        = $forest.SchemaMaster
 					ADObject      = $schemaObject
 					Configuration = $schemaSetting

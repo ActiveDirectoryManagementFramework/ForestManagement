@@ -1,5 +1,4 @@
-﻿function Resolve-SchemaAttribute
-{
+﻿function Resolve-SchemaAttribute {
 	<#
 	.SYNOPSIS
 		Combines configuration and adobject into an attributes hashtable.
@@ -33,34 +32,51 @@
 		$ADObject
 	)
 	
-	process
-	{
+	process {
 		#region Build out basic attribute hashtable
 		$attributes = @{
-			adminDisplayName = $Configuration.AdminDisplayName
-			lDAPDisplayName  = $Configuration.LdapDisplayName
-			attributeId	     = $Configuration.OID
-			oMSyntax		 = $Configuration.OMSyntax
-			attributeSyntax  = $Configuration.AttributeSyntax
-			isSingleValued   = ($Configuration.SingleValued -as [bool])
-			adminDescription = $Configuration.AdminDescription
-			searchflags	     = $Configuration.SearchFlags
+			adminDisplayName              = $Configuration.AdminDisplayName
+			lDAPDisplayName               = $Configuration.LdapDisplayName
+			attributeId                   = $Configuration.OID
+			oMSyntax                      = $Configuration.OMSyntax
+			attributeSyntax               = $Configuration.AttributeSyntax
+			isSingleValued                = ($Configuration.SingleValued -as [bool])
+			adminDescription              = $Configuration.AdminDescription
+			searchflags                   = $Configuration.SearchFlags
 			isMemberOfPartialAttributeSet = $Configuration.PartialAttributeSet
-			showInAdvancedViewOnly = $Configuration.AdvancedView
+			showInAdvancedViewOnly        = $Configuration.AdvancedView
 		}
 		#endregion Build out basic attribute hashtable
+
+		if (-not $ADObject) { return $attributes }
 		
 		#region If ADObject is present: Remove attributes that are already present
-		$attributeNames = 'isSingleValued', 'searchflags', 'isMemberOfPartialAttributeSet', 'oMSyntax', 'attributeId', 'adminDescription', 'adminDisplayName', 'showInAdvancedViewOnly', 'lDAPDisplayName', 'attributeSyntax'
-		
-		if ($ADObject)
-		{
-			foreach ($attributeName in $attributeNames)
-			{
-				if ($ADobject.$attributeName -ceq $attributes[$attributeName])
-				{
-					$attributes.Remove($attributeName)
-				}
+		$attributeNames = @(
+			'isSingleValued'
+			'searchflags'
+			'isMemberOfPartialAttributeSet'
+			'oMSyntax'
+			'attributeId'
+			'adminDescription'
+			'adminDisplayName'
+			'showInAdvancedViewOnly'
+			'lDAPDisplayName'
+			'attributeSyntax'
+		)
+		$systemOnly = @(
+			'isSingleValued'
+			'oMSyntax'
+			'attributeId'
+			'attributeSyntax'
+		)
+
+		foreach ($attributeName in $attributeNames) {
+			if ($ADObject.$attributeName -ceq $attributes[$attributeName]) {
+				$attributes.Remove($attributeName)
+			}
+			if ($attributes.Keys -contains $attributeName -and $systemOnly -contains $attributeName) {
+				Write-PSFMessage -Level Warning -String 'Resolve-SchemaAttribute.Update.SystemOnlyError' -StringValues $attributeName, $attributes.$attributeName, $ADObject
+				$attributes.Remove($attributeName)
 			}
 		}
 		#endregion If ADObject is present: Remove attributes that are already present

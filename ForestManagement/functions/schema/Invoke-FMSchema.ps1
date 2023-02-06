@@ -1,5 +1,4 @@
-﻿function Invoke-FMSchema
-{
+﻿function Invoke-FMSchema {
 	<#
 		.SYNOPSIS
 			Updates the schema to conform to the desired state.
@@ -53,8 +52,7 @@
 		$EnableException
 	)
 	
-	begin
-	{
+	begin {
 		$parameters = $PSBoundParameters | ConvertTo-PSFHashtable -Include Server, Credential
 		$parameters['Debug'] = $false
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
@@ -88,8 +86,7 @@
 		# Prepare parameters to use for when discarding the schema credentials
 		if ($cred -and ($cred -ne $Credential)) { $removeParameters['SchemaAccountCredential'] = $cred }
 	}
-	process
-	{
+	process {
 		if (Test-PSFFunctionInterrupt) { return }
 
 		if (-not $InputObject) {
@@ -105,7 +102,7 @@
 		:main foreach ($testItem in $testResultsSorted) {
 			switch ($testItem.Type) {
 				#region Create new Schema Attribute
-				'ConfigurationOnly' {
+				'Create' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Creating.Attribute' -Target $testItem.Identity -ScriptBlock {
 						New-ADObject @parameters -Type attributeSchema -Name $testItem.Configuration.AdminDisplayName -Path $rootDSE.schemaNamingContext -OtherAttributes (Resolve-SchemaAttribute -Configuration $testItem.Configuration) -ErrorAction Stop
 						Update-Schema @parameters
@@ -149,7 +146,7 @@
 				#endregion Decommission the unwanted Schema Attribute
 
 				#region Update Schema Attribute
-				'InEqual' {
+				'Update' {
 					$resolvedAttributes = Resolve-SchemaAttribute -Configuration $testItem.Configuration -ADObject $testItem.ADObject
 					if ($resolvedAttributes.Keys.Count -ge 1) {
 						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Updating.Attribute' -ActionStringValues ($resolvedAttributes.Keys -join ', ') -Target $testItem.Identity -ScriptBlock {
@@ -160,15 +157,31 @@
 					# Do not process MayContain for defunct attributes
 					if ($testItem.Configuration.IsDefunct) { continue }
 
-					foreach ($class in  $testItem.Configuration.ObjectClass) {
+					# Only proceed if any Object Class changes are intended
+					$change = $testItem.Changed | Where-Object Property -EQ 'ObjectClass'
+					if (-not $change) { continue }
+
+					foreach ($class in $change.New | Where-Object { $_ -notin $change.Old }) {
 						try { $classObject = Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(name=$($class))" -ErrorAction Stop -Properties mayContain }
 						catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
 						if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
-
+	
 						if ($classObject.mayContain -notcontains $testItem.ADObject.LdapDisplayName) {
-							Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Assigning.Attribute.ToObjectClass' -ActionStringValues $class -Target $testItem.Identity -ScriptBlock {
+							Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Assigning.Attribute.ToObjectClass' -ActionStringValues $class, $testItem.Identity -Target $testItem.Identity -ScriptBlock {
 								$classObject | Set-ADObject @parameters -Add @{ mayContain = $testItem.ADObject.LdapDisplayName } -ErrorAction Stop
-							} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet -Continue
+							} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+						}
+					}
+
+					foreach ($class in $change.Old | Where-Object { $_ -notin $change.New }) {
+						try { $classObject = Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(name=$($class))" -ErrorAction Stop -Properties mayContain }
+						catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
+						if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
+	
+						if ($classObject.mayContain -notcontains $testItem.ADObject.LdapDisplayName) {
+							Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Removing.Attribute.FromObjectClass' -ActionStringValues $class, $testItem.Identity -Target $testItem.Identity -ScriptBlock {
+								$classObject | Set-ADObject @parameters -Remove @{ mayContain = $testItem.ADObject.LdapDisplayName } -ErrorAction Stop
+							} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 						}
 					}
 				}
@@ -184,8 +197,7 @@
 			}
 		}
 	}
-	end
-	{
+	end {
 		if (Test-PSFFunctionInterrupt) { return }
 
 		if (Test-SchemaAdminCredential) {
