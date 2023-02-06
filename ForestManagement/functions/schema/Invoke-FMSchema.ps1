@@ -178,7 +178,7 @@
 						catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
 						if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
 	
-						if ($classObject.mayContain -notcontains $testItem.ADObject.LdapDisplayName) {
+						if ($classObject.mayContain -contains $testItem.ADObject.LdapDisplayName) {
 							Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Removing.Attribute.FromObjectClass' -ActionStringValues $class, $testItem.Identity -Target $testItem.Identity -ScriptBlock {
 								$classObject | Set-ADObject @parameters -Remove @{ mayContain = $testItem.ADObject.LdapDisplayName } -ErrorAction Stop
 							} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
