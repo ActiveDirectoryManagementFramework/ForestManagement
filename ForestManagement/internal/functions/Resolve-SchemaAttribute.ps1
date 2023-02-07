@@ -48,7 +48,21 @@
 		}
 		#endregion Build out basic attribute hashtable
 
-		if (-not $ADObject) { return $attributes }
+		#region Case: New Attribute
+		if (-not $ADObject) {
+			$badProperties = foreach ($pair in $attributes.GetEnumerator()) {
+				if ($null -eq $pair.Value) { $pair.Key }
+			}
+			if ($null -eq $Configuration.SingleValued) { $badProperties = @($badProperties) + @('SingleValued') }
+			if ($badProperties) {
+				throw "Cannot create new attribute $($Configuration.AdminDisplayName), missing attributes: $($badProperties -join ',')"
+			}
+
+			return $attributes
+		}
+		#endregion Case: New Attribute
+
+		$properties = $Configuration.PSObject.Properties.Name | Set-String -OldValue '^SingleValued$' -NewValue 'isSingleValued'
 		
 		#region If ADObject is present: Remove attributes that are already present
 		$attributeNames = @(
@@ -71,6 +85,10 @@
 		)
 
 		foreach ($attributeName in $attributeNames) {
+			if ($attributeName -notin $properties) {
+				$attributes.Remove($attributeName)
+				continue
+			}
 			if ($ADObject.$attributeName -ceq $attributes[$attributeName]) {
 				$attributes.Remove($attributeName)
 			}
