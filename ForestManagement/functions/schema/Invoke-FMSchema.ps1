@@ -147,11 +147,11 @@
 
 				#region Update Schema Attribute
 				'Update' {
-					$resolvedAttributes = Resolve-SchemaAttribute -Configuration $testItem.Configuration -ADObject $testItem.ADObject
+					$resolvedAttributes = Resolve-SchemaAttribute -Configuration $testItem.Configuration -ADObject $testItem.ADObject -Changes $testItem.Changed
 					if ($resolvedAttributes.Keys.Count -ge 1) {
 						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Updating.Attribute' -ActionStringValues ($resolvedAttributes.Keys -join ', ') -Target $testItem.Identity -ScriptBlock {
 							$testItem.ADObject | Set-ADObject @parameters -Replace $resolvedAttributes -ErrorAction Stop
-						} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet -Continue
+						} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 					}
 
 					# Do not process MayContain for defunct attributes

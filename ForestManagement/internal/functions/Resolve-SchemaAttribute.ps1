@@ -14,6 +14,9 @@
 		The ADObject - if present - containing the current schema attribute configuration.
 		Specifying this will cause it to return a delta hashtable useful for updating attributes.
 	
+	.PARAMETER Changes
+		Changes to be applied to an existing attribute.
+
 	.EXAMPLE
 		PS C:\> Resolve-SchemaAttribute -Configuration $testItem.Configuration
 
@@ -29,8 +32,38 @@
 	param (
 		$Configuration,
 		
-		$ADObject
+		$ADObject,
+
+		$Changes
 	)
+
+	begin {
+		function Convert-AttributeName {
+			[CmdletBinding()]
+			param (
+				[Parameter(ValueFromPipeline = $true)]
+				[AllowEmptyCollection()]
+				[AllowEmptyString()]
+				[AllowNull()]
+				[string[]]
+				$Name
+			)
+
+			process {
+				foreach ($entry in $Name) {
+					if ($null -eq $entry) { continue }
+
+					switch ($entry) {
+						SingleValued { 'isSingleValued' }
+						OID { 'attributeID' }
+						PartialAttributeSet { 'isMemberOfPartialAttributeSet' }
+						AdvancedView { 'showInAdvancedViewOnly' }
+						default { $_ }
+					}
+				}
+			}
+		}
+	}
 	
 	process {
 		#region Build out basic attribute hashtable
@@ -62,21 +95,12 @@
 		}
 		#endregion Case: New Attribute
 
-		$properties = $Configuration.PSObject.Properties.Name | Set-String -OldValue '^SingleValued$' -NewValue 'isSingleValued'
+		#region Case: Update Settings
+		$updates = @{ }
+		foreach ($change in $Changes) {
+			$updates[($change.Property | Convert-AttributeName)] = $change.New
+		}
 		
-		#region If ADObject is present: Remove attributes that are already present
-		$attributeNames = @(
-			'isSingleValued'
-			'searchflags'
-			'isMemberOfPartialAttributeSet'
-			'oMSyntax'
-			'attributeId'
-			'adminDescription'
-			'adminDisplayName'
-			'showInAdvancedViewOnly'
-			'lDAPDisplayName'
-			'attributeSyntax'
-		)
 		$systemOnly = @(
 			'isSingleValued'
 			'oMSyntax'
@@ -84,20 +108,14 @@
 			'attributeSyntax'
 		)
 
-		foreach ($attributeName in $attributeNames) {
-			if ($attributeName -notin $properties) {
-				$attributes.Remove($attributeName)
-				continue
-			}
-			if ($ADObject.$attributeName -ceq $attributes[$attributeName]) {
-				$attributes.Remove($attributeName)
-			}
-			if ($attributes.Keys -contains $attributeName -and $systemOnly -contains $attributeName) {
+		foreach ($attributeName in ($updates.Keys | Write-Output)) {
+			
+			if ($systemOnly -contains $attributeName) {
 				Write-PSFMessage -Level Warning -String 'Resolve-SchemaAttribute.Update.SystemOnlyError' -StringValues $attributeName, $attributes.$attributeName, $ADObject
 				$attributes.Remove($attributeName)
 			}
 		}
-		#endregion If ADObject is present: Remove attributes that are already present
+		#endregion Case: Update Settings
 		
 		$attributes
 	}
