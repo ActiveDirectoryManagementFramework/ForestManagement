@@ -1,5 +1,16 @@
 ﻿# Changelog
 
+## 1.5.54 (2023-02-10)
+
+- Upd: Schema - almost all settings are now optional and will only be applied if set
+- Upd: Schema - new configuration option `Optional` allows modifying an existing attribute without creating a new one in an environment where it does not exist yet.
+- Upd: Schema - now able to remove assignments of attributes to classes, not just adding them.
+- Upd: Schema - updated test result, renaming `InEqual` to `Update`
+- Upd: Schema - updated test result, renaming `ConfigurationOnly` to `Create`
+- Upd: Schema - significantly improved user experience of `Update`-type test results
+- Fix: Schema - fails to update a schema attribute where one or more attributes that are system protected are not equal to requirements.
+- Fix: SchemaLdif - "Argument is null or empty" error when using an account with the `<name>@<domain>` format
+
 ## 1.5.46 (2022-09-16)
 
 - Upd: ExchangeSchema - added support for pipeline input for invocation

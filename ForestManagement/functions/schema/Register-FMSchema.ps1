@@ -50,6 +50,10 @@
 		Flag this attribute as defunct.
 		It will be marked as such in AD, be delisted from the Global Catalog and removed from all its supposed memberships.
 
+	.PARAMETER Optional
+		By default, all defined schema attributes must exist.
+		By setting a schema attribute optional, it will be tolerated if it exists, but not created if it does not.
+
 	.PARAMETER ContextName
 		The name of the context defining the setting.
 		This allows determining the configuration set that provided this setting.
@@ -62,7 +66,7 @@
 #>
 	[CmdletBinding()]
 	Param (
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[AllowEmptyCollection()]
 		[string[]]
 		$ObjectClass,
@@ -71,11 +75,11 @@
 		[string]
 		$OID,
 		
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[string]
 		$AdminDisplayName,
 		
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[string]
 		$LdapDisplayName,
 
@@ -83,37 +87,41 @@
 		[string]
 		$Name,
 		
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[int]
 		$OMSyntax,
 		
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[string]
 		$AttributeSyntax,
 		
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[switch]
 		$SingleValued,
 		
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[string]
 		$AdminDescription,
 		
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[int]
 		$SearchFlags,
 		
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[bool]
 		$PartialAttributeSet,
 		
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[bool]
 		$AdvancedView,
 
 		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[bool]
 		$IsDefunct,
+
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
+		[bool]
+		$Optional,
 
 		[string]
 		$ContextName = '<Undefined>'
@@ -123,22 +131,11 @@
 		$nameResult = $Name
 		if (-not $Name) { $nameResult = $AdminDisplayName }
 
-		$script:schema[$OID] = [PSCustomObject]@{
-			PSTypeName          = 'ForestManagement.Schema.Configuration'
-			ObjectClass         = $ObjectClass
-			OID                 = $OID
-			AdminDisplayName    = $AdminDisplayName
-			LdapDisplayName     = $LdapDisplayName
-			Name                = $nameResult
-			OMSyntax            = $OMSyntax
-			AttributeSyntax     = $AttributeSyntax
-			SingleValued        = $SingleValued
-			AdminDescription    = $AdminDescription
-			SearchFlags         = $SearchFlags
-			PartialAttributeSet = $PartialAttributeSet
-			AdvancedView        = $AdvancedView
-			IsDefunct           = $IsDefunct
-			ContextName         = $ContextName
-		}
+		$hashtable = $PSBoundParameters | ConvertTo-PSFHashtable
+		$hashtable.ContextName = $ContextName
+		$hashtable.PSTypeName = 'ForestManagement.Schema.Configuration'
+		if ($nameResult) { $hashtable.Name = $nameResult }
+
+		$script:schema[$OID] = [PSCustomObject]$hashtable
 	}
 }

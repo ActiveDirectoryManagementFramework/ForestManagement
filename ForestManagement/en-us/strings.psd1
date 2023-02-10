@@ -42,7 +42,7 @@
 	'Invoke-FMNTAuthStore.Remove'                                 = 'Removing certificate from the NTAuthStore: {0}' # $testResult.ADObject.Subject
 	'Invoke-FMNTAuthStore.WinRM.Failed'                           = 'Failed to connect to {0} via WinRM' # $computerName
 	
-	'Invoke-FMSchema.Assigning.Attribute.ToObjectClass'           = 'Assigning attribute to object class {0}' # $class
+	'Invoke-FMSchema.Assigning.Attribute.ToObjectClass'           = 'Assigning attribute {1} to object class {0}' # $class, $testItem.Identity
 	'Invoke-FMSchema.Connect.Failed'                              = 'Failed to connect to {0}' # $Server
 	'Invoke-FMSchema.Creating.Attribute'                          = 'Creating a new schema attribute' # 
 	'Invoke-FMSchema.Credentials.Test'                            = 'Testing ADWS connectivity to the Schema Master' # 
@@ -51,6 +51,7 @@
 	'Invoke-FMSchema.Decommission.MustContain'                    = 'Removing attribute {0} from class''s {1} MustContain attribute' # $testItem.ADObject.LdapDisplayName, $adObject.LdapDisplayName
 	'Invoke-FMSchema.Reading.ObjectClass.Failed'                  = 'Error searching for object class {0}' # $class
 	'Invoke-FMSchema.Reading.ObjectClass.NotFound'                = 'Failed to find object class {0}' # $class
+	'Invoke-FMSchema.Removing.Attribute.FromObjectClass'          = 'Removing attribute {1} from object class: {0}' # $class, $testItem.Identity
 	'Invoke-FMSchema.Rename.Attribute'                            = 'Renaming attribute {0} to {1}' # $testItem.ADObject.cn, $testItem.Configuration.Name
 	'Invoke-FMSchema.Schema.Credentials'                          = 'Resolving credentials for schema administration' # 
 	'Invoke-FMSchema.Schema.Credentials.Release'                  = 'Releasing/Postprocessing credentials used for schema administration' # 
@@ -103,6 +104,7 @@
 	'Remove-SchemaAdminCredential.TemporaryAccount.Remove'        = 'Removing temporary schema admin account {0}' # $script:temporarySchemaUpdateUser.Name
 	'Remove-SchemaAdminCredential.TemporaryAccount.Remove.Failed' = 'Failed to remove temporary schema admin account {0}' # $script:temporarySchemaUpdateUser.Name
 	
+	'Resolve-SchemaAttribute.Update.SystemOnlyError'              = 'Cannot update {0} to {1} on {2}. The attribute property is system protected and can only ever be defined when creating a new attribute! This cannot be undone and only replacing the attribute with a new attribute will allow you to resolve the issue.' # $attributeName, $attributes.$attributeName, $ADObject
 	'Test-FMSchema.Connect.Failed'                                = 'Failed to connect to {0}' # $Server
 	
 	'Test-FMSchemaDefaultPermission.Class.IdentityUncertain'      = 'Unable to resolve all identities for the default permissions to apply to {0}. This objectclass will be skipped instead.' # $Configuration[0].ClassName
