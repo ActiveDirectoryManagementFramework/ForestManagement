@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## ???
+## 1.5.54 (2023-02-10)
 
 - Upd: Schema - almost all settings are now optional and will only be applied if set
 - Upd: Schema - new configuration option `Optional` allows modifying an existing attribute without creating a new one in an environment where it does not exist yet.
