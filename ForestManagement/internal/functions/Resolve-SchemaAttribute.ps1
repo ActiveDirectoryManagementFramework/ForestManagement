@@ -39,6 +39,7 @@
 
 	begin {
 		function Convert-AttributeName {
+			[OutputType([string])]
 			[CmdletBinding()]
 			param (
 				[Parameter(ValueFromPipeline = $true)]
