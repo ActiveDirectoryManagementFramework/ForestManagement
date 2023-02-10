@@ -56,8 +56,13 @@
 		if ($Credential) {
 			$arguments += "-b"
 			$networkCredential = $Credential.GetNetworkCredential()
-			$arguments += $networkCredential.UserName
-			$arguments += $networkCredential.Domain
+			$userName = $networkCredential.UserName
+			$domain = $networkCredential.Domain
+			if (-not $domain -and $userName -match '@') {
+				$userName, $domain = $userName -split '@',2
+			}
+			$arguments += $userName
+			if ($domain) { $arguments += $domain }
 			$arguments += $networkCredential.Password
 		}
 		#  Load target server
