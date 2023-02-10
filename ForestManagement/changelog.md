@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.5.55 (2023-02-10)
+
+- Fix: Schema - fails to update an attribute
+
 ## 1.5.54 (2023-02-10)
 
 - Upd: Schema - almost all settings are now optional and will only be applied if set

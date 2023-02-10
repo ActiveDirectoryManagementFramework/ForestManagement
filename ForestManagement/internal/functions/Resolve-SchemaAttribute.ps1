@@ -113,11 +113,11 @@
 			
 			if ($systemOnly -contains $attributeName) {
 				Write-PSFMessage -Level Warning -String 'Resolve-SchemaAttribute.Update.SystemOnlyError' -StringValues $attributeName, $attributes.$attributeName, $ADObject
-				$attributes.Remove($attributeName)
+				$updates.Remove($attributeName)
 			}
 		}
 		#endregion Case: Update Settings
 		
-		$attributes
+		$updates
 	}
 }
