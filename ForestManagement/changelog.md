@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.5.56 (2023-05-16)
+
+- Fix: Schema - fails to create an attribute with index error
+
 ## 1.5.55 (2023-02-10)
 
 - Fix: Schema - fails to update an attribute
