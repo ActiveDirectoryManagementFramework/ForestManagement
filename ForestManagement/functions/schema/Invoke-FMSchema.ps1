@@ -113,7 +113,7 @@
 						catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
 						if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
 
-						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Assigning.Attribute.ToObjectClass' -ActionStringValues $class -Target $testItem.Identity -ScriptBlock {
+						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Assigning.Attribute.ToObjectClass' -ActionStringValues $class,$testItem.Identity -Target $testItem.Identity -ScriptBlock {
 							$classObject | Set-ADObject @parameters -Add @{ mayContain = $testItem.Configuration.LdapDisplayName } -ErrorAction Stop
 						} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue -RetryCount 10
 					}
