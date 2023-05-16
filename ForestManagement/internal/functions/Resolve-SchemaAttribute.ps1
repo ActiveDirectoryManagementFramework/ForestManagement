@@ -99,6 +99,7 @@
 		#region Case: Update Settings
 		$updates = @{ }
 		foreach ($change in $Changes) {
+			if ('ObjectClass' -eq $change.Property) { continue }
 			$updates[($change.Property | Convert-AttributeName)] = $change.New
 		}
 		

@@ -48,6 +48,17 @@
 		}
 		$forest = Get-ADForest @parameters
 		$parameters["Server"] = $forest.SchemaMaster
+
+		#region Display Code
+		$objectClassToString = {
+			$updates = do {
+				$this.New | Where-Object { $_ -notin @($this.Old) } | Format-String '+{0}'
+				$this.Old | Where-Object { $_ -notin @($this.New) } | Format-String '-{0}'
+			}
+			until ($true)
+			'ObjectClass: {0}' -f ($updates -join ', ')
+		}
+		#endregion Display Code
 	}
 	process {
 		# Pick up termination flag from Stop-PSFFunction and interrupt if begin failed to connect
@@ -127,16 +138,16 @@
 			if (-not $schemaSetting.IsDefunct -and $schemaSetting.PSObject.Properties.Name -contains 'Objectclass') {
 				$mayContain = Get-ADObject @parameters -LDAPFilter "(mayContain=$($schemaSetting.LdapDisplayName))" -SearchBase $rootDSE.schemaNamingContext
 				if (-not $mayContain -and $schemaSetting.ObjectClass) {
-					$null = $changes.Add((New-AdcChange -Property ObjectClass -NewValue $schemaSetting.ObjectClass -Identity $schemaObject.DistinguishedName -Type Schema))
+					$null = $changes.Add((New-AdcChange -Property ObjectClass -NewValue $schemaSetting.ObjectClass -Identity $schemaObject.DistinguishedName -Type Schema -ToString $objectClassToString))
 				}
 				elseif ($mayContain.Name -and -not $schemaSetting.ObjectClass) {
-					$null = $changes.Add((New-AdcChange -Property ObjectClass -OldValue $mayContain.Name -Identity $schemaObject.DistinguishedName -Type Schema))
+					$null = $changes.Add((New-AdcChange -Property ObjectClass -OldValue $mayContain.Name -Identity $schemaObject.DistinguishedName -Type Schema -ToString $objectClassToString))
 				}
 				elseif (-not $mayContain.Name -and -not $schemaSetting.ObjectClass) {
 					# Nothing wrong here
 				}
 				elseif ($mayContain.Name | Compare-Object $schemaSetting.ObjectClass) {
-					$null = $changes.Add((New-AdcChange -Property ObjectClass -OldValue $mayContain.Name -NewValue $schemaSetting.ObjectClass -Identity $schemaObject.DistinguishedName -Type Schema))
+					$null = $changes.Add((New-AdcChange -Property ObjectClass -OldValue $mayContain.Name -NewValue $schemaSetting.ObjectClass -Identity $schemaObject.DistinguishedName -Type Schema -ToString $objectClassToString))
 				}
 			}
 
