@@ -1,5 +1,10 @@
 ﻿# Changelog
 
+## 1.5.58 (2023-05-16)
+
+- Upd: Test-FMSchema - improved the test results user experience
+- Fix: Invoke-FMSchema - error when updating ObjectClass assignment of attributes
+
 ## 1.5.56 (2023-05-16)
 
 - Fix: Schema - fails to create an attribute with index error
