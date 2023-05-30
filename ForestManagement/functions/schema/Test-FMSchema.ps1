@@ -119,6 +119,7 @@
 				ADObject      = $schemaObject
 				CaseSensitive = $true
 				IfExists      = $true
+				AsUpdate      = $true
 				Changes       = $changes
 				Type          = 'Schema'
 			}
