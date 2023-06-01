@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## ???
+## 1.5.59 (2023-06-01)
 
 - Fix: Test-FMSchema - test results would lead to unexpected error on updates
 
