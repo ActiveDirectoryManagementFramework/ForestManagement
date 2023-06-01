@@ -3,7 +3,7 @@
 	RootModule = 'ForestManagement.psm1'
 	
 	# Version number of this module.
-	ModuleVersion = '1.5.58'
+	ModuleVersion = '1.5.59'
 	
 	# ID used to uniquely identify this module
 	GUID = '7de4379d-17c8-48d3-bd6d-93279aef64bb'

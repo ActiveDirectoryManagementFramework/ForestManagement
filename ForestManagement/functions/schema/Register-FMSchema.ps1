@@ -96,7 +96,7 @@
 		$AttributeSyntax,
 		
 		[Parameter(ValueFromPipelineByPropertyName = $true)]
-		[switch]
+		[bool]
 		$SingleValued,
 		
 		[Parameter(ValueFromPipelineByPropertyName = $true)]
