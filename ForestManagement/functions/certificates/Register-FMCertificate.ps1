@@ -1,5 +1,4 @@
-﻿function Register-FMCertificate
-{
+﻿function Register-FMCertificate {
 	<#
 		.SYNOPSIS
 			Register directory services certificates
@@ -19,6 +18,11 @@
 	
 		.PARAMETER Remove
 			Thumbprint of a certificate to remove rather than add.
+
+		.PARAMETER ContextName
+			The name of the context defining the setting.
+			This allows determining the configuration set that provided this setting.
+			Used by the ADMF, available to any other configuration management solution.
 
 		.EXAMPLE
 			PS C:\> Register-FMCertificate -Certificate $certificate -Type RootCA
@@ -52,19 +56,20 @@
 		
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = 'Remove')]
 		[string]
-		$Remove
+		$Remove,
+
+		[string]
+		$ContextName = '<Undefined>'
 	)
 	
-	process
-	{
-		switch ($pscmdlet.ParameterSetName)
-		{
-			Certificate
-			{
+	process {
+		switch ($pscmdlet.ParameterSetName) {
+			Certificate {
 				$object = [pscustomobject]@{
 					Certificate = $Certificate
-					Type	    = $Type
-					Action	    = 'Add'
+					Type        = $Type
+					Action      = 'Add'
+					ContextName = $ContextName
 				}
 				Add-Member -InputObject $object -MemberType ScriptMethod -Name ToString -Value {
 					'+ {0} > {1}' -f $this.Type, $this.Certificate.Subject
@@ -72,12 +77,12 @@
 				$script:dsCertificates[$Certificate.Thumbprint] = $object
 			}
 			Authorative { $script:dsCertificatesAuthorative[$Type] = $Authorative }
-			Remove
-			{
+			Remove {
 				$object = [pscustomobject]@{
-					Thumbprint = $Remove
-					Type	   = $Type
-					Action	   = 'Remove'
+					Thumbprint  = $Remove
+					Type        = $Type
+					Action      = 'Remove'
+					ContextName = $ContextName
 				}
 				Add-Member -InputObject $object -MemberType ScriptMethod -Name ToString -Value {
 					'- {0} > {1}' -f $this.Type, $this.Thumbprint

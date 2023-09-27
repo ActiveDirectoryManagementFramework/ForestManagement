@@ -50,7 +50,8 @@
 		$forest = Get-ADForest @parameters
 		if ($forest.ForestMode -lt $desiredLevel)
 		{
-			New-TestResult -ObjectType ForestLevel -Type Raise -Identity $forest -Server $Server -Configuration ([pscustomobject]$tempConfiguration) -ADObject $forest
+			$change = New-AdcChange -Property ForestLevel -OldValue $forest.ForestMode -NewValue $level.Level -Type ForestLevel -Identity $forest -ToString { '{0}: {1} -> {2}' -f $this.Identity, $this.Old, $this.New }
+			New-TestResult -ObjectType ForestLevel -Type Raise -Identity $forest -Server $Server -Configuration ([pscustomobject]$tempConfiguration) -ADObject $forest -Changed $change
 		}
 	}
 }
