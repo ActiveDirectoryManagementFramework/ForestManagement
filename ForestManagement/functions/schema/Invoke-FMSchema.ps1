@@ -190,7 +190,7 @@
 				#region Rename Schema Attribute
 				'Rename' {
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Rename.Attribute' -ActionStringValues $testItem.ADObject.cn, $testItem.Configuration.Name -Target $testItem -ScriptBlock {
-						$testItem.ADObject | Rename-ADObject -NewName $testItem.Configuration.Name -ErrorAction Stop
+						$testItem.ADObject | Rename-ADObject @parameters -NewName $testItem.Configuration.Name -ErrorAction Stop
 					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 				}
 				#endregion Rename Schema Attribute
