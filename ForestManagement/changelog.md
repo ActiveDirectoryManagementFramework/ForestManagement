@@ -1,5 +1,15 @@
 ﻿# Changelog
 
+## 1.5.66 (2023-09-27)
+
+- Upd: Certificates - added support to provide the context name
+- Upd: Exchange Schema - setup will now always use the local DC for domain interaction
+- Upd: Forest Level - will automatically target the Domain Naming Master FSMO holder (as it needs to)
+- Fix: Schema - fails to use credentials when renaming an attribute
+- Fix: Exchange Schema - split permission test results will be ignored when invoking
+- Fix: Exchange Schema - split permission processing for child domains is incorrect
+- Fix: Exchange Schema - fails to apply changes without error due to bad exitcodes from setup.exe
+
 ## 1.5.59 (2023-06-01)
 
 - Fix: Test-FMSchema - test results would lead to unexpected error on updates

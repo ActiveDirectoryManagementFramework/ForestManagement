@@ -36,7 +36,7 @@
 	)
 	
 	process {
-		switch ($pscmdlet.ParameterSetName) {
+		switch ($PSCmdlet.ParameterSetName) {
 			Certificate { $script:ntAuthStoreCertificates[$Certificate.Thumbprint] = $Certificate }
 			Authorative { $script:ntAuthStoreAuthorative = $Authorative.ToBool() }
 		}
