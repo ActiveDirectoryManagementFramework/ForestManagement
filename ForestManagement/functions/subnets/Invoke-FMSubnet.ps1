@@ -54,6 +54,7 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type Subnets -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
 	}
 	process
 	{

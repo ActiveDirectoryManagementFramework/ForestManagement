@@ -54,6 +54,7 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type ForestLevel -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
 
 		# Must be executed against the Domain Naming Master
 		$forest = Get-ADForest @parameters
