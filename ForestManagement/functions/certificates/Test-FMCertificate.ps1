@@ -35,6 +35,7 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type dsCertificates -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
 	}
 	process
 	{

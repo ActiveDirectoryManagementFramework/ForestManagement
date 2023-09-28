@@ -61,6 +61,8 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type Subnets -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
+		
 		$allSubnets = Get-ADReplicationSubnet @parameters -Filter * -Properties Description | Select-Object *, @{
 			Name       = "SiteName"
 			Expression = { ($_.Site | Get-ADObject @parameters).Name }

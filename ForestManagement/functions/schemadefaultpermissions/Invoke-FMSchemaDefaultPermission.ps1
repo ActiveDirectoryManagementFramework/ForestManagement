@@ -136,6 +136,8 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type SchemaDefaultPermissions -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
+
 		try { $rootDSE = Get-ADRootDSE @parameters -ErrorAction Stop }
 		catch
 		{

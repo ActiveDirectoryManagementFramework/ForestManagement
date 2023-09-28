@@ -56,6 +56,8 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type SchemaLdif -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
+		
 		try {
 			$forest = Get-ADForest @parameters -ErrorAction Stop
 		}

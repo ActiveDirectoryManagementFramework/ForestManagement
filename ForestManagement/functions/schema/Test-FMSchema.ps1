@@ -41,6 +41,8 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type Schema -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
+
 		try { $rootDSE = Get-ADRootDSE @parameters -ErrorAction Stop }
 		catch {
 			Stop-PSFFunction -String 'Test-FMSchema.Connect.Failed' -StringValues $Server -ErrorRecord $_ -EnableException $EnableException -Exception $_.Exception.GetBaseException()

@@ -61,6 +61,8 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type SiteLinks -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
+		
 		$allSiteLinks = Get-ADReplicationSiteLink @parameters -Filter * -Properties Cost, Description, Options, Name, replInterval, siteList | Select-Object *
 		$linksToExclude = @()
 

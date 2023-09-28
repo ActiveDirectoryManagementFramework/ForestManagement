@@ -33,6 +33,7 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type ntAuthStoreCertificates -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
 
 		#region Utility Functions
 		function New-TestResult {

@@ -34,6 +34,7 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type ForestLevel -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
 	}
 	process
 	{

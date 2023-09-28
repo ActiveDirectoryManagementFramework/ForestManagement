@@ -34,6 +34,7 @@
 	'Invoke-FMExchangeSchema.WinRM.Failed'                        = 'Failed to connect to "{0}" via WinRM/PowerShell Remoting.' # $computerName
 	'Invoke-FMExchangeSchema.DisablingSplitPermissions'           = 'Disabling split permissions for {0}' # $testItem.Configuration
 	'Invoke-FMExchangeSchema.EnablingSplitPermissions'            = 'Enabling split permissions for {0}' # $testItem.Configuration
+	'Invoke-FMExchangeSchema.SchemaMaster.WrongSite'              = 'Error applying Exchange Schema update: Target server {0} must be in the same site as the Schema Master {1}' # $parameters.Server, $forest.SchemaMaster
 	
 	'Invoke-FMForestLevel.Raise.Level'                            = 'Raising forest level to {0}' # $testItem.Configuration.Level
 	

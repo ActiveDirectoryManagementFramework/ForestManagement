@@ -61,6 +61,8 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type Sites -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
+		
 		$allSites = Get-ADReplicationSite @parameters -Filter * -Properties Location
 		$renameMapping = @{}
 		$script:sites.Values | Where-Object OldNames | ForEach-Object {
