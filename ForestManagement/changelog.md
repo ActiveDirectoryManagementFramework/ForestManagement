@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## 1.5.70 (2023-09-28)
+
+- Fix: Name Resolution - string replacement will not always have the correct data to insert
+- Fix: Exchange Schema - error message is missing when catching invalid setup.exe
+- Fix: Exchange Schema - removed forced DC selection (previous change was caused by an analysis error)
+- Fix: Exchange Schema - fails to update due to Organization Name being passed in
+
 ## 1.5.66 (2023-09-27)
 
 - Upd: Certificates - added support to provide the context name

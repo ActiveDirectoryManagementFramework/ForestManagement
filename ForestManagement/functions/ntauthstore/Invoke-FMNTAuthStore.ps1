@@ -54,6 +54,7 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type ntAuthStoreCertificates -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
 		
 		$computerName = (Get-ADDomain @parameters).PDCEmulator
 		$psParameter = $PSBoundParameters | ConvertTo-PSFHashtable -Include ComputerName, Credential -Inherit

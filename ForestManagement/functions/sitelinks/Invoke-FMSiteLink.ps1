@@ -52,6 +52,7 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type SiteLinks -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
 	}
 	process {
 		if (-not $InputObject) {

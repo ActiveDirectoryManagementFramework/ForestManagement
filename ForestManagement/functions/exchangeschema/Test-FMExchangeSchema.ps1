@@ -32,6 +32,7 @@
 		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
 		Invoke-Callback @parameters -Cmdlet $PSCmdlet
 		Assert-Configuration -Type ExchangeSchema -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
 		
 		#region Utility Functions
 		function Get-ExchangeRangeUpper {
