@@ -50,7 +50,7 @@
 		$parameters = $PSBoundParameters | ConvertTo-PSFHashtable -Include Server, Credential
 		$parameters['Debug'] = $false
 		$parameters['Server'] = (Get-ADForest @parameters).SchemaMaster
-		$domain = Get-ADDomain @parameters
+		$domainObject = Get-ADDomain @parameters
 		
 		$arguments = @()
 		if ($Credential) {
@@ -74,7 +74,7 @@
 		$arguments += '-k' # Ignore errors for items that already exist
 		$arguments += '-c'
 		$arguments += 'DC=X'
-		$arguments += $domain.DistinguishedName
+		$arguments += $domainObject.DistinguishedName
 
 		# Load File
 		$arguments += '-f'
