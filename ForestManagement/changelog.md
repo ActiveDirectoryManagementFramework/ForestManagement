@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.5.71 (2023-11-02)
+
+- Fix: Schema Ldif - fails to deploy changes with custom credentials
+
 ## 1.5.70 (2023-09-28)
 
 - Fix: Name Resolution - string replacement will not always have the correct data to insert
