@@ -156,34 +156,38 @@
 						} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
 					}
 
-					# Do not process MayContain for defunct attributes
+					# Do not process MayContain or MustContain for defunct attributes
 					if ($testItem.Configuration.IsDefunct) { continue }
 
 					# Only proceed if any Object Class changes are intended
-					$change = $testItem.Changed | Where-Object Property -EQ 'ObjectClass'
-					if (-not $change) { continue }
+					$changes = $testItem.Changed | Where-Object Property -in 'MayBeContainedIn','MustBeContainedIn'
+					if (-not $changes) { continue }
 
-					foreach ($class in $change.New | Where-Object { $_ -notin $change.Old }) {
-						try { $classObject = Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(name=$($class))" -ErrorAction Stop -Properties mayContain }
-						catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
-						if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
-	
-						if ($classObject.mayContain -notcontains $testItem.ADObject.LdapDisplayName) {
-							Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Assigning.Attribute.ToObjectClass' -ActionStringValues $class, $testItem.Identity -Target $testItem.Identity -ScriptBlock {
-								$classObject | Set-ADObject @parameters -Add @{ mayContain = $testItem.ADObject.LdapDisplayName } -ErrorAction Stop
-							} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+					foreach ($change in $changes) {
+						$property = 'mayContain'
+						if ($change.Property -eq 'MustBeContainedIn') { $property = 'mustContain' }
+						foreach ($class in $change.New | Where-Object { $_ -notin $change.Old }) {
+							try { $classObject = Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(name=$($class))" -ErrorAction Stop -Properties $property }
+							catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
+							if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
+		
+							if ($classObject.$property -notcontains $testItem.ADObject.LdapDisplayName) {
+								Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Assigning.Attribute.ToObjectClass' -ActionStringValues $class, $testItem.Identity -Target $testItem.Identity -ScriptBlock {
+									$classObject | Set-ADObject @parameters -Add @{ $property = $testItem.ADObject.LdapDisplayName } -ErrorAction Stop
+								} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+							}
 						}
-					}
-
-					foreach ($class in $change.Old | Where-Object { $_ -notin $change.New }) {
-						try { $classObject = Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(name=$($class))" -ErrorAction Stop -Properties mayContain }
-						catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
-						if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
 	
-						if ($classObject.mayContain -contains $testItem.ADObject.LdapDisplayName) {
-							Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Removing.Attribute.FromObjectClass' -ActionStringValues $class, $testItem.Identity -Target $testItem.Identity -ScriptBlock {
-								$classObject | Set-ADObject @parameters -Remove @{ mayContain = $testItem.ADObject.LdapDisplayName } -ErrorAction Stop
-							} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+						foreach ($class in $change.Old | Where-Object { $_ -notin $change.New }) {
+							try { $classObject = Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(name=$($class))" -ErrorAction Stop -Properties $property }
+							catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
+							if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
+		
+							if ($classObject.$property -contains $testItem.ADObject.LdapDisplayName) {
+								Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Removing.Attribute.FromObjectClass' -ActionStringValues $class, $testItem.Identity -Target $testItem.Identity -ScriptBlock {
+									$classObject | Set-ADObject @parameters -Remove @{ $property = $testItem.ADObject.LdapDisplayName } -ErrorAction Stop
+								} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+							}
 						}
 					}
 				}
