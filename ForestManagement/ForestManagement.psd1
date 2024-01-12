@@ -26,7 +26,7 @@
 	# Modules that must be imported into the global environment prior to importing
 	# this module
 	RequiredModules   = @(
-		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.7.270' }
+		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.10.318' }
 		
 		# Additional Dependencies, cannot declare due to bug in dependency handling in PS5.1
 		# @{ ModuleName = 'ResolveString'; ModuleVersion = '1.0.0' }
