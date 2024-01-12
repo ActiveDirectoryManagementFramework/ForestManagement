@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## ??? (???)
+## 1.5.73 (2024-01-12)
 
 - Upd: Schema - added parameters "MayBeContainedIn" and "MustBeContainedIn" to support both options
 - Fix: Schema - empty admin descriptions cause a change, even though they are configured as empty.
