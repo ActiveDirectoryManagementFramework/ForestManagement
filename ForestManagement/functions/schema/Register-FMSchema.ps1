@@ -10,6 +10,12 @@
 	
 	.PARAMETER ObjectClass
 		The class to assign the new attribute to.
+
+	.PARAMETER MayBeContainedIn
+		The classes which may contain this attribute.
+
+	.PARAMETER MustBeContainedIn
+		The classes which MUST contain this attribute.
 	
 	.PARAMETER OID
 		The unique OID of the attribute.
@@ -64,12 +70,22 @@
 
 		Registers all extension attributes in the json file as schema settings to apply when running Invoke-FMSchema.
 #>
-	[CmdletBinding()]
+	[CmdletBinding(DefaultParameterSetName = 'Contained')]
 	Param (
-		[Parameter(ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true, ParameterSetName = 'ObjectClass')]
 		[AllowEmptyCollection()]
 		[string[]]
 		$ObjectClass,
+
+		[Parameter(ValueFromPipelineByPropertyName = $true, ParameterSetName = 'Contained')]
+		[AllowEmptyCollection()]
+		[string[]]
+		$MayBeContainedIn,
+		
+		[Parameter(ValueFromPipelineByPropertyName = $true, ParameterSetName = 'Contained')]
+		[AllowEmptyCollection()]
+		[string[]]
+		$MustBeContainedIn,
 		
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
 		[string]
@@ -135,6 +151,10 @@
 		$hashtable.ContextName = $ContextName
 		$hashtable.PSTypeName = 'ForestManagement.Schema.Configuration'
 		if ($nameResult) { $hashtable.Name = $nameResult }
+		if ($PSBoundParameters.Keys -contains 'ObjectClass') {
+			$hashtable.Remove('ObjectClass')
+			$hashtable.MayBeContainedIn = $ObjectClass
+		}
 
 		$script:schema[$OID] = [PSCustomObject]$hashtable
 	}
