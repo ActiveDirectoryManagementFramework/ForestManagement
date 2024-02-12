@@ -149,32 +149,32 @@
 			if (-not $schemaSetting.IsDefunct -and $schemaSetting.PSObject.Properties.Name -contains 'MayBeContainedIn') {
 				$mayContain = Get-ADObject @parameters -LDAPFilter "(mayContain=$($schemaSetting.LdapDisplayName))" -SearchBase $rootDSE.schemaNamingContext
 				if (-not $mayContain -and $schemaSetting.MayBeContainedIn) {
-					$null = $changes.Add((New-AdcChange -Property MayBeContainedIn -NewValue $schemaSetting.MayBeContainedIn -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mayContainToString))
+					$null = $changes.Add((New-AdcChange -Property MayContain -NewValue $schemaSetting.MayBeContainedIn -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mayContainToString))
 				}
 				elseif ($mayContain.Name -and -not $schemaSetting.MayBeContainedIn) {
-					$null = $changes.Add((New-AdcChange -Property MayBeContainedIn -OldValue $mayContain.Name -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mayContainToString))
+					$null = $changes.Add((New-AdcChange -Property MayContain -OldValue $mayContain.Name -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mayContainToString))
 				}
 				elseif (-not $mayContain.Name -and -not $schemaSetting.MayBeContainedIn) {
 					# Nothing wrong here
 				}
 				elseif ($mayContain.Name | Compare-Object $schemaSetting.MayBeContainedIn) {
-					$null = $changes.Add((New-AdcChange -Property MayBeContainedIn -OldValue $mayContain.Name -NewValue $schemaSetting.MayBeContainedIn -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mayContainToString))
+					$null = $changes.Add((New-AdcChange -Property MayContain -OldValue $mayContain.Name -NewValue $schemaSetting.MayBeContainedIn -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mayContainToString))
 				}
 			}
 
 			if (-not $schemaSetting.IsDefunct -and $schemaSetting.PSObject.Properties.Name -contains 'MustBeContainedIn') {
 				$mustContain = Get-ADObject @parameters -LDAPFilter "(mustContain=$($schemaSetting.LdapDisplayName))" -SearchBase $rootDSE.schemaNamingContext
 				if (-not $mustContain -and $schemaSetting.MustBeContainedIn) {
-					$null = $changes.Add((New-AdcChange -Property MustBeContainedIn -NewValue $schemaSetting.MustBeContainedIn -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mustContainToString))
+					$null = $changes.Add((New-AdcChange -Property MustContain -NewValue $schemaSetting.MustBeContainedIn -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mustContainToString))
 				}
 				elseif ($mustContain.Name -and -not $schemaSetting.MustBeContainedIn) {
-					$null = $changes.Add((New-AdcChange -Property MustBeContainedIn -OldValue $mustContain.Name -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mustContainToString))
+					$null = $changes.Add((New-AdcChange -Property MustContain -OldValue $mustContain.Name -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mustContainToString))
 				}
 				elseif (-not $mustContain.Name -and -not $schemaSetting.MustBeContainedIn) {
 					# Nothing wrong here
 				}
 				elseif ($mustContain.Name | Compare-Object $schemaSetting.MustBeContainedIn) {
-					$null = $changes.Add((New-AdcChange -Property MustBeContainedIn -OldValue $mustContain.Name -NewValue $schemaSetting.MustBeContainedIn -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mustContainToString))
+					$null = $changes.Add((New-AdcChange -Property MustContain -OldValue $mustContain.Name -NewValue $schemaSetting.MustBeContainedIn -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mustContainToString))
 				}
 			}
 

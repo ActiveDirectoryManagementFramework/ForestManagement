@@ -110,13 +110,23 @@
 						Update-Schema @parameters
 					} -EnableException $EnableException.ToBool() -PSCmdlet $PSCmdlet -Continue
 					
-					foreach ($class in  $testItem.Configuration.ObjectClass) {
+					foreach ($class in  $testItem.Configuration.MayBeContainedIn) {
 						try { $classObject = Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(name=$($class))" -ErrorAction Stop }
 						catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
 						if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
 
 						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Assigning.Attribute.ToObjectClass' -ActionStringValues $class,$testItem.Identity -Target $testItem.Identity -ScriptBlock {
 							$classObject | Set-ADObject @parameters -Add @{ mayContain = $testItem.Configuration.LdapDisplayName } -ErrorAction Stop
+						} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue -RetryCount 10
+					}
+
+					foreach ($class in  $testItem.Configuration.MustBeContainedIn) {
+						try { $classObject = Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(name=$($class))" -ErrorAction Stop }
+						catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
+						if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
+
+						Invoke-PSFProtectedCommand -ActionString 'Invoke-FMSchema.Assigning.Attribute.ToObjectClass' -ActionStringValues $class,$testItem.Identity -Target $testItem.Identity -ScriptBlock {
+							$classObject | Set-ADObject @parameters -Add @{ mustContain = $testItem.Configuration.LdapDisplayName } -ErrorAction Stop
 						} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue -RetryCount 10
 					}
 				}
@@ -160,13 +170,14 @@
 					if ($testItem.Configuration.IsDefunct) { continue }
 
 					# Only proceed if any Object Class changes are intended
-					$changes = $testItem.Changed | Where-Object Property -in 'MayBeContainedIn','MustBeContainedIn'
+					$changes = $testItem.Changed | Where-Object Property -in 'MayContain','MustContain'
 					if (-not $changes) { continue }
 
 					foreach ($change in $changes) {
 						$property = 'mayContain'
-						if ($change.Property -eq 'MustBeContainedIn') { $property = 'mustContain' }
+						if ($change.Property -eq 'MustContain') { $property = 'mustContain' }
 						foreach ($class in $change.New | Where-Object { $_ -notin $change.Old }) {
+							if (-not $class) { continue }
 							try { $classObject = Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(name=$($class))" -ErrorAction Stop -Properties $property }
 							catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
 							if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
@@ -179,6 +190,7 @@
 						}
 	
 						foreach ($class in $change.Old | Where-Object { $_ -notin $change.New }) {
+							if (-not $class) { continue }
 							try { $classObject = Get-ADObject @parameters -SearchBase $rootDSE.schemaNamingContext -LDAPFilter "(name=$($class))" -ErrorAction Stop -Properties $property }
 							catch { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.Failed' -StringValues $class -EnableException $EnableException -Continue -ErrorRecord $_ }
 							if (-not $classObject) { Stop-PSFFunction -String 'Invoke-FMSchema.Reading.ObjectClass.NotFound' -StringValues $class -EnableException $EnableException -Continue }
