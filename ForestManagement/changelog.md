@@ -1,5 +1,10 @@
 ﻿# Changelog
 
+## 1.5.75 (2024-02-12)
+
+- Fix: Schema - fails to add new attributes to classes.
+- Fix: Schema - fails to on update when adding to or removing from classes.
+
 ## 1.5.73 (2024-01-12)
 
 - Upd: Schema - added parameters "MayBeContainedIn" and "MustBeContainedIn" to support both options
