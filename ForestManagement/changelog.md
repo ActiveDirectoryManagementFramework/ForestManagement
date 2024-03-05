@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.5.76 (2024-03-05)
+
+- Fix: Exchange Schema - invoke fails on validating sites.
+
 ## 1.5.75 (2024-02-12)
 
 - Fix: Schema - fails to add new attributes to classes.
