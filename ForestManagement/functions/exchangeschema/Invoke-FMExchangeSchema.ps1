@@ -224,8 +224,8 @@
 					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
-					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forest)) {
-						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forest.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
+					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forestObject)) {
+						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forestObject.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Installing' -ActionStringValues $testItem.Configuration -Target $forestObject -ScriptBlock {
 						Invoke-ExchangeSchemaUpdate @commonParam -Mode InstallSchema -SchemaOnly
@@ -238,8 +238,8 @@
 					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
-					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forest)) {
-						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forest.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
+					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forestObject)) {
+						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forestObject.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Updating' -ActionStringValues $testItem.ADObject, $testItem.Configuration -Target $forestObject -ScriptBlock {
 						Invoke-ExchangeSchemaUpdate @commonParam -Mode UpdateSchema -SchemaOnly
@@ -252,8 +252,8 @@
 					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
-					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forest)) {
-						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forest.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
+					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forestObject)) {
+						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forestObject.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Installing' -ActionStringValues $testItem.Configuration -Target $forestObject -ScriptBlock {
 						Invoke-ExchangeSchemaUpdate @commonParam -Mode Install
@@ -266,8 +266,8 @@
 					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
-					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forest)) {
-						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forest.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
+					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forestObject)) {
+						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forestObject.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.Updating' -ActionStringValues $testItem.ADObject, $testItem.Configuration -Target $forestObject -ScriptBlock {
 						Invoke-ExchangeSchemaUpdate @commonParam -Mode Update
@@ -279,8 +279,8 @@
 					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
-					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forest)) {
-						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forest.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
+					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forestObject)) {
+						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forestObject.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.DisablingSplitPermissions' -ActionStringValues $testItem.Configuration -Target $Server -ScriptBlock {
 						Invoke-ExchangeSchemaUpdate @commonParam -Mode DisableSplitP -AllDomains $testItem.Configuration.AllDomains
@@ -290,8 +290,8 @@
 					if (-not (Test-ExchangeIsoPath -Session $session -Path $testItem.Configuration.LocalImagePath)) {
 						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.IsoPath.Missing' -StringValues $testItem.Configuration.LocalImagePath -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
-					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forest)) {
-						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forest.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
+					if (-not (Test-ExchangeSite -Parameters $parameters -Forest $forestObject)) {
+						Stop-PSFFunction -String 'Invoke-FMExchangeSchema.SchemaMaster.WrongSite' -StringValues $parameters.Server, $forestObject.SchemaMaster -EnableException $EnableException -Continue -Category ResourceUnavailable -Target $Server
 					}
 					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMExchangeSchema.EnablingSplitPermissions' -ActionStringValues $testItem.Configuration -Target $Server -ScriptBlock {
 						Invoke-ExchangeSchemaUpdate @commonParam -Mode EnableSplitP -AllDomains $testItem.Configuration.AllDomains
