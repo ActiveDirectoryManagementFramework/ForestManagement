@@ -74,9 +74,13 @@
 		# Pick up termination flag from Stop-PSFFunction and interrupt if begin failed to connect
 		if (Test-PSFFunctionInterrupt) { return }
 
+		$allAttributes = Get-ADObject @parameters -LDAPFilter "(attributeID=*)" -SearchBase $rootDSE.schemaNamingContext -ErrorAction Ignore -Properties *
+		$allClasses = Get-ADObject @parameters -LDAPFilter "(objectClass=classSchema)" -SearchBase $rootDSE.schemaNamingContext -ErrorAction Ignore -Properties *
+
+		#region Process Configuration
 		foreach ($schemaSetting in (Get-FMSchema)) {
 			$schemaObject = $null
-			$schemaObject = Get-ADObject @parameters -LDAPFilter "(attributeID=$($schemaSetting.OID))" -SearchBase $rootDSE.schemaNamingContext -ErrorAction Ignore -Properties *
+			$schemaObject = $allAttributes.Where{ $_.attributeID -eq $schemaSetting.OID }[0]
 
 			if (-not $schemaObject) {
 				# If we already want to disable the attribute, no need to create it
@@ -147,7 +151,7 @@
 			}
 
 			if (-not $schemaSetting.IsDefunct -and $schemaSetting.PSObject.Properties.Name -contains 'MayBeContainedIn') {
-				$mayContain = Get-ADObject @parameters -LDAPFilter "(mayContain=$($schemaSetting.LdapDisplayName))" -SearchBase $rootDSE.schemaNamingContext
+				$mayContain = $allClasses.Where{ $_.MayContain -contains $schemaSetting.LdapDisplayName }
 				if (-not $mayContain -and $schemaSetting.MayBeContainedIn) {
 					$null = $changes.Add((New-AdcChange -Property MayContain -NewValue $schemaSetting.MayBeContainedIn -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mayContainToString))
 				}
@@ -163,7 +167,7 @@
 			}
 
 			if (-not $schemaSetting.IsDefunct -and $schemaSetting.PSObject.Properties.Name -contains 'MustBeContainedIn') {
-				$mustContain = Get-ADObject @parameters -LDAPFilter "(mustContain=$($schemaSetting.LdapDisplayName))" -SearchBase $rootDSE.schemaNamingContext
+				$mustContain = $allClasses.Where{ $_.mustContain -contains $schemaSetting.LdapDisplayName }
 				if (-not $mustContain -and $schemaSetting.MustBeContainedIn) {
 					$null = $changes.Add((New-AdcChange -Property MustContain -NewValue $schemaSetting.MustBeContainedIn -Identity $schemaObject.DistinguishedName -Type Schema -ToString $mustContainToString))
 				}
@@ -191,5 +195,24 @@
 				}
 			}
 		}
+		#endregion Process Configuration
+
+		#region Process AD Only
+		if (-not (Get-PSFConfigValue -FullName 'ForestManagement.Schema.Attributes.ReportUnconfigured')) { return }
+		$unconfigured = $allAttributes | Where-Object attributeID -NotIn (Get-FMSchema).OID
+		foreach ($unexpectedAttribute in $unconfigured) {
+			if ($unexpectedAttribute.IsDefunct) { continue }
+			[PSCustomObject]@{
+				PSTypeName    = 'ForestManagement.Schema.TestResult'
+				Type          = 'Unmanaged'
+				ObjectType    = 'Schema'
+				Identity      = $unexpectedAttribute.AdminDisplayName
+				Changed       = $null
+				Server        = $forest.SchemaMaster
+				ADObject      = $unexpectedAttribute
+				Configuration = $null
+			}
+		}
+		#endregion Process AD Only
 	}
 }

@@ -1,5 +1,10 @@
 ﻿# Changelog
 
+## 1.5.78 (2024-12-13)
+
+- Upd: Schema - significant test performance improvements
+- Upd: Schema - added option to scan _all_ attributes and report any unconfigured ones as "Unmanaged"
+
 ## 1.5.76 (2024-03-05)
 
 - Fix: Exchange Schema - invoke fails on validating sites.
