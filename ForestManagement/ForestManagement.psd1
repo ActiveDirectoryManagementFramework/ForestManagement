@@ -3,7 +3,7 @@
 	RootModule = 'ForestManagement.psm1'
 	
 	# Version number of this module.
-	ModuleVersion = '1.5.76'
+	ModuleVersion = '1.5.78'
 	
 	# ID used to uniquely identify this module
 	GUID = '7de4379d-17c8-48d3-bd6d-93279aef64bb'
@@ -26,7 +26,7 @@
 	# Modules that must be imported into the global environment prior to importing
 	# this module
 	RequiredModules   = @(
-		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.10.318' }
+		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.12.346' }
 		
 		# Additional Dependencies, cannot declare due to bug in dependency handling in PS5.1
 		# @{ ModuleName = 'ResolveString'; ModuleVersion = '1.0.0' }
