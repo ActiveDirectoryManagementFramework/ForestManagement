@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.5.79 (2025-05-28)
+
+- Upd: Schema - Test results are returned in the order they should be applied, to simplify use with Invoke-AdmfItem
+
 ## 1.5.78 (2024-12-13)
 
 - Upd: Schema - significant test performance improvements
