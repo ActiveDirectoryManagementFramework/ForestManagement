@@ -78,7 +78,7 @@
 		$allClasses = Get-ADObject @parameters -LDAPFilter "(objectClass=classSchema)" -SearchBase $rootDSE.schemaNamingContext -ErrorAction Ignore -Properties *
 
 		#region Process Configuration
-		foreach ($schemaSetting in (Get-FMSchema)) {
+		$results = foreach ($schemaSetting in (Get-FMSchema)) {
 			$schemaObject = $null
 			$schemaObject = $allAttributes.Where{ $_.attributeID -eq $schemaSetting.OID }[0]
 
@@ -194,6 +194,15 @@
 					Configuration = $schemaSetting
 				}
 			}
+		}
+
+		# Ensure tests are returned in sorting order needed to invoke.
+		# Invoke-FMSchema doesn't care - it invokes correctly - but Invoke-AdmfItem will have issues otherwise
+		$results | Sort-Object Identity, {
+			if ($_.Type -eq 'Decommission') { 0 }
+			elseif ($_.Type -eq 'Rename') { 2 }
+			elseif ($_.Type -eq 'ConfigurationOnly') { 3 }
+			else { 1 }
 		}
 		#endregion Process Configuration
 
