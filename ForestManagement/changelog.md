@@ -1,5 +1,10 @@
 ﻿# Changelog
 
+## 1.5.81 (2025-10-02)
+
+- Upd: Schema - added parameter to report unmanaged attributes (which will lead to no action during invoke)
+- Fix: ExchangeSchema - fails to report failure to update because of a pending reboot
+
 ## 1.5.79 (2025-05-28)
 
 - Upd: Schema - Test results are returned in the order they should be applied, to simplify use with Invoke-AdmfItem

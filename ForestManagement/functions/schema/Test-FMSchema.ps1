@@ -14,6 +14,9 @@
 		.PARAMETER Credential
 			The credentials to use for this operation.
 
+		.PARAMETER ReportUnconfigured
+			Whether to generate test results for unconfigured schema attributes.
+
 		.PARAMETER EnableException
 			This parameters disables user-friendly warnings and enables the throwing of exceptions.
 			This is less user friendly, but allows catching exceptions in calling scripts.
@@ -30,6 +33,9 @@
 
 		[PSCredential]
 		$Credential,
+
+		[switch]
+		$ReportUnconfigured = (Get-PSFConfigValue -FullName 'ForestManagement.Schema.Attributes.ReportUnconfigured'),
 
 		[switch]
 		$EnableException
@@ -207,7 +213,7 @@
 		#endregion Process Configuration
 
 		#region Process AD Only
-		if (-not (Get-PSFConfigValue -FullName 'ForestManagement.Schema.Attributes.ReportUnconfigured')) { return }
+		if (-not $ReportUnconfigured) { return }
 		$unconfigured = $allAttributes | Where-Object attributeID -NotIn (Get-FMSchema).OID
 		foreach ($unexpectedAttribute in $unconfigured) {
 			if ($unexpectedAttribute.IsDefunct) { continue }

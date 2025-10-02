@@ -191,6 +191,7 @@
 
 			# Test Message validation (Text parsing is bad, but the method below is less reliable)
 			if ($result.Message -match 'The Exchange Server setup operation completed successfully') { return }
+			if ($result.Message -match 'A reboot from a previous installation is pending') { throw "Error applying exchange update: A reboot is pending!"}
 
 			# Exchange's setup.exe is not always reliable in its exit codes, thus we need to retest
 			# This is not guaranteed to work 100%, as replication delay may lead to false errors
