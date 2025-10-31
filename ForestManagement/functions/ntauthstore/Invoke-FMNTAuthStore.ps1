@@ -58,7 +58,7 @@
 		
 		$computerName = (Get-ADDomain @parameters).PDCEmulator
 		$psParameter = $PSBoundParameters | ConvertTo-PSFHashtable -Include ComputerName, Credential -Inherit
-		try { $session = New-PSSession @psParameter -ErrorAction Stop }
+		try { $session = New-AdcPSSession @psParameter -ErrorAction Stop }
 		catch {
 			Stop-PSFFunction -String 'Invoke-FMNTAuthStore.WinRM.Failed' -StringValues $computerName -ErrorRecord $_ -EnableException $EnableException -Cmdlet $PSCmdlet -Target $computerName
 			return
