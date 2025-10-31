@@ -60,7 +60,7 @@
 		$psParameter = $PSBoundParameters | ConvertTo-PSFHashtable -Include Credential
 		$psParameter.ComputerName = $Server
 		
-		try { $session = New-PSSession @psParameter -ErrorAction Stop }
+		try { $session = New-AdcPSSession @psParameter -ErrorAction Stop }
 		catch {
 			Stop-PSFFunction -String 'Invoke-FMExchangeSchema.WinRM.Failed' -StringValues $computerName -ErrorRecord $_ -EnableException $EnableException -Cmdlet $PSCmdlet -Target $computerName
 			return

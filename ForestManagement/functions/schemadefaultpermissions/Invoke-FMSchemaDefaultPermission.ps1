@@ -151,7 +151,7 @@
 			$psParameters = $parameters.Clone()
 			$psParameters.Remove('Server')
 			$psParameters.ComputerName = $forest.SchemaMaster
-			$session = New-PSSession @psParameters -ErrorAction Stop
+			$session = New-AdcPSSession @psParameters -ErrorAction Stop
 		} -EnableException $EnableException -PSCmdlet $PSCmdlet -WhatIf:$false -Confirm:$false
 		#endregion WinRM
 		
