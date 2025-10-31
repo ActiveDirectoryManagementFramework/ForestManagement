@@ -2,7 +2,7 @@
 
 ## 1.5.82 (2025-10-31)
 
-- Upd: Access Rules - Use the shared managed remoting feature, allowing configuring session options.
+- Upd: General - Use the shared managed remoting feature, allowing configuring session options.
 
 ## 1.5.81 (2025-10-02)
 
