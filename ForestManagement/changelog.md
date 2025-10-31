@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 1.5.82 (2025-10-31)
+
+- Upd: General - Use the shared managed remoting feature, allowing configuring session options.
+
 ## 1.5.81 (2025-10-02)
 
 - Upd: Schema - added parameter to report unmanaged attributes (which will lead to no action during invoke)
