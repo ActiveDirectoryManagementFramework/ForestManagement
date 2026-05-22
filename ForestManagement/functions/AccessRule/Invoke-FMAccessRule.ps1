@@ -1,0 +1,166 @@
+﻿function Invoke-FMAccessRule {
+	<#
+	.SYNOPSIS
+		Applies the desired state of accessrule configuration.
+	
+	.DESCRIPTION
+		Applies the desired state of accessrule configuration.
+		Define the desired state with Register-FMAccessRule.
+		Test the desired state with Test-FMAccessRule.
+	
+	.PARAMETER InputObject
+		Test results provided by the associated test command.
+		Only the provided changes will be executed, unless none were specified, in which ALL pending changes will be executed.
+	
+	.PARAMETER Server
+		The server / domain to work with.
+	
+	.PARAMETER Credential
+		The credentials to use for this operation.
+
+	.PARAMETER Confirm
+		If this switch is enabled, you will be prompted for confirmation before executing any operations that change state.
+	
+	.PARAMETER WhatIf
+		If this switch is enabled, no actions are performed but informational messages will be displayed that explain what would happen if the command were to run.
+	
+	.PARAMETER EnableException
+		This parameters disables user-friendly warnings and enables the throwing of exceptions.
+		This is less user friendly, but allows catching exceptions in calling scripts.
+	
+	.EXAMPLE
+		PS C:\> Invoke-FMAccessRule -Server contoso.com
+
+		Applies the desired access rule configuration to the contoso.com forest.
+	#>
+	[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+	param (
+		[Parameter(ValueFromPipeline = $true)]
+		$InputObject,
+		
+		[PSFComputer]
+		$Server,
+		
+		[PSCredential]
+		$Credential,
+
+		[switch]
+		$EnableException
+	)
+	
+	begin {
+		$parameters = $PSBoundParameters | ConvertTo-PSFHashtable -Include Server, Credential
+		$parameters['Debug'] = $false
+		Assert-ADConnection @parameters -Cmdlet $PSCmdlet
+		Invoke-Callback @parameters -Cmdlet $PSCmdlet
+		Assert-Configuration -Type accessRules -Cmdlet $PSCmdlet
+		Set-FMDomainContext @parameters
+
+		$alternativeRemoval = Get-PSFConfigValue -FullName 'ForestManagement.AccessRules.Remove.Option2' -Fallback $false
+	}
+	process {
+		if (-not $InputObject) {
+			$InputObject = Test-FMAccessRule @parameters
+		}
+		
+		foreach ($testItem in $InputObject) {
+			# Catch invalid input - can only process test results
+			if ($testItem.PSObject.TypeNames -notcontains 'ForestManagement.AccessRule.TestResult') {
+				Stop-PSFFunction -String 'General.Invalid.Input' -StringValues 'Test-FMAccessRule', $testItem -Target $testItem -Continue -EnableException $EnableException
+			}
+			
+			switch ($testItem.Type) {
+				'Update' {
+					Write-PSFMessage -Level Debug -String 'Invoke-FMAccessRule.Processing.Rules' -StringValues $testItem.Identity, $testItem.Changed.Count -Target $testItem
+
+					try { $aclObject = Get-AdsAcl @parameters -Path $testItem.Identity -EnableException }
+					catch { Stop-PSFFunction -String 'Invoke-FMAccessRule.Access.Failed' -StringValues $testItem.Identity -EnableException $EnableException -Target $testItem -Continue -ErrorRecord $_ }
+					$failedCount = 0
+					foreach ($changeEntry in $testItem.Changed) {
+						#region Remove Access Rules
+						if ($changeEntry.Type -eq 'Delete') {
+							Write-PSFMessage -Level InternalComment -String 'Invoke-FMAccessRule.AccessRule.Remove' -StringValues $changeEntry.ADObject.IdentityReference, $changeEntry.ADObject.ActiveDirectoryRights, $changeEntry.ADObject.AccessControlType, $changeEntry.DistinguishedName -Target $changeEntry
+							try { $aclObject.RemoveAccessRuleSpecific($changeEntry.ADObject.OriginalRule) }
+							catch {
+								Write-PSFMessage -Level Warning -String 'Invoke-FMAccessRule.AccessRule.Remove.Error.Consistency' -StringValues $testItem.Identity -Target $changeEntry
+								continue
+							}
+							Remove-RedundantAce -AccessControlList $aclObject -IdentityReference $changeEntry.ADObject.OriginalRule.IdentityReference
+							
+							$stillThere = $false
+							foreach ($rule in $aclObject.GetAccessRules($true, $false, [System.Security.Principal.NTAccount])) {
+								if (Test-AdcAccessRuleEquality -Parameters $parameters -Rule1 $rule -Rule2 $changeEntry.ADObject.OriginalRule) {
+									$stillThere = $true
+									$failedCount = $failedCount + 1
+									break
+								}
+							}
+
+							if ($stillThere -and $alternativeRemoval) {
+								$null = $aclObject.RemoveAccessRule($changeEntry.ADObject.OriginalRule)
+								Remove-RedundantAce -AccessControlList $aclObject -IdentityReference $changeEntry.ADObject.OriginalRule.IdentityReference
+							
+								$stillThere = $false
+								foreach ($rule in $aclObject.GetAccessRules($true, $false, [System.Security.Principal.NTAccount])) {
+									if (Test-AdcAccessRuleEquality -Parameters $parameters -Rule1 $rule -Rule2 $changeEntry.ADObject.OriginalRule) {
+										$stillThere = $true
+										$failedCount = $failedCount + 1
+										break
+									}
+								}
+							}
+
+							if ($stillThere) {
+								Write-PSFMessage -Level Warning -String 'Invoke-FMAccessRule.AccessRule.Remove.Failed' -StringValues $changeEntry.ADObject.IdentityReference, $changeEntry.ADObject.ActiveDirectoryRights, $changeEntry.ADObject.AccessControlType, $changeEntry.DistinguishedName -Target $changeEntry -Debug:$false
+							}
+							continue
+						}
+						#endregion Remove Access Rules
+
+						#region Add Access Rules
+						if ($changeEntry.Type -eq 'Create') {
+							Write-PSFMessage -Level InternalComment -String 'Invoke-FMAccessRule.AccessRule.Create' -StringValues $changeEntry.Configuration.IdentityReference, $changeEntry.Configuration.ActiveDirectoryRights, $changeEntry.Configuration.AccessControlType -Target $changeEntry
+							try {
+								if (-not $changeEntry.Configuration.ObjectType) { throw "Unknown ObjectType! Unable to translate $($changeEntry.Configuration.ObjectTypeName). Validate the configuration and ensure pending schema updates (e.g. Exchange, Skype, etc.) have been applied." }
+								if (-not $changeEntry.Configuration.InheritedObjectType) { throw "Unknown InheritedObjectType! Unable to translate $($changeEntry.Configuration.InheritedObjectTypeName). Validate the configuration and ensure pending schema updates (e.g. Exchange, Skype, etc.) have been applied." }
+								$accessRule = [System.DirectoryServices.ActiveDirectoryAccessRule]::new((Convert-AdcPrincipal @parameters -Name $changeEntry.Configuration.IdentityReference), $changeEntry.Configuration.ActiveDirectoryRights, $changeEntry.Configuration.AccessControlType, $changeEntry.Configuration.ObjectType, $changeEntry.Configuration.InheritanceType, $changeEntry.Configuration.InheritedObjectType)
+							}
+							catch {
+								$failedCount = $failedCount + 1
+								Stop-PSFFunction -String 'Invoke-FMAccessRule.AccessRule.Creation.Failed' -StringValues $testItem.Identity, $changeEntry.Configuration.IdentityReference -EnableException $EnableException -Target $changeEntry -Continue -ErrorRecord $_
+							}
+							$null = $aclObject.AddAccessRule($accessRule)
+							#TODO: Validation and remediation of success. Adding can succeed but not do anything, when accessrules are redundant. Potentially flag it for full replacement?
+							continue
+						}
+						#endregion Add Access Rules
+
+						#region Restore Default Access Rules
+						if ($changeEntry.Type -eq 'Restore') {
+							Write-PSFMessage -Level InternalComment -String 'Invoke-FMAccessRule.AccessRule.Restore' -StringValues $changeEntry.Configuration.IdentityReference, $changeEntry.Configuration.ActiveDirectoryRights, $changeEntry.Configuration.AccessControlType -Target $changeEntry
+							try {
+								if (-not $changeEntry.Configuration.ObjectType) { throw "Unknown ObjectType! Unable to translate $($changeEntry.Configuration.ObjectTypeName). Validate the configuration and ensure pending schema updates (e.g. Exchange, Skype, etc.) have been applied." }
+								if (-not $changeEntry.Configuration.InheritedObjectType) { throw "Unknown InheritedObjectType! Unable to translate $($changeEntry.Configuration.InheritedObjectTypeName). Validate the configuration and ensure pending schema updates (e.g. Exchange, Skype, etc.) have been applied." }
+								$accessRule = [System.DirectoryServices.ActiveDirectoryAccessRule]::new((Convert-AdcPrincipal @parameters -Name $changeEntry.Configuration.IdentityReference), $changeEntry.Configuration.ActiveDirectoryRights, $changeEntry.Configuration.AccessControlType, $changeEntry.Configuration.ObjectType, $changeEntry.Configuration.InheritanceType, $changeEntry.Configuration.InheritedObjectType)
+							}
+							catch {
+								$failedCount = $failedCount + 1
+								Stop-PSFFunction -String 'Invoke-FMAccessRule.AccessRule.Creation.Failed' -StringValues $testItem.Identity, $changeEntry.Configuration.IdentityReference -EnableException $EnableException -Target $changeEntry -Continue -ErrorRecord $_
+							}
+							$null = $aclObject.AddAccessRule($accessRule)
+							#TODO: Validation and remediation of success. Adding can succeed but not do anything, when accessrules are redundant. Potentially flag it for full replacement?
+							continue
+						}
+						#endregion Restore Default Access Rules
+					}
+					Invoke-PSFProtectedCommand -ActionString 'Invoke-FMAccessRule.Processing.Execute' -ActionStringValues ($testItem.Changed.Count - $failedCount), $testItem.Changed.Count -Target $testItem -ScriptBlock {
+						Set-AdsAcl @parameters -Path $testItem.Identity -AclObject $aclObject -EnableException -Confirm:$false
+					} -EnableException $EnableException -PSCmdlet $PSCmdlet -Continue
+				}
+				'MissingADObject' {
+					Write-PSFMessage -Level Warning -String 'Invoke-FMAccessRule.ADObject.Missing' -StringValues $testItem.Identity -Target $testItem -Debug:$false
+				}
+			}
+		}
+	}
+}

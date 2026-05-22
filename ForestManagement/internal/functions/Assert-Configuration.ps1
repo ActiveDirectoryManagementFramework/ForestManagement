@@ -1,5 +1,4 @@
-﻿function Assert-Configuration
-{
+﻿function Assert-Configuration {
 	<#
 	.SYNOPSIS
 		Ensures a set of configuration settings has been provided for the specified setting type.
@@ -22,9 +21,9 @@
 		Asserts, that users have already been specified.
 	#>
 	[CmdletBinding()]
-	Param (
+	param (
 		[Parameter(Mandatory = $true)]
-		[string]
+		[string[]]
 		$Type,
 
 		[Parameter(Mandatory = $true)]
@@ -32,9 +31,10 @@
 		$Cmdlet
 	)
 	
-	process
-	{
-		if ((Get-Variable -Name $Type -Scope Script -ValueOnly).Count -gt 0) { return }
+	process {
+		foreach ($typeName in $type) {
+			if ((Get-Variable -Name $typeName -Scope Script -ValueOnly -ErrorAction SilentlyContinue).Count -gt 0) { return }
+		}
 		
 		Write-PSFMessage -Level Warning -String 'Assert-Configuration.NotConfigured' -StringValues $Type -FunctionName $Cmdlet.CommandRuntime
 

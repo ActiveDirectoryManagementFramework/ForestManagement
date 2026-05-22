@@ -30,3 +30,9 @@ Set-PSFConfig -Module 'ForestManagement' -Name 'Schema.Account.AutoGrant' -Value
 Set-PSFConfig -Module 'ForestManagement' -Name 'Schema.Account.AutoRevoke' -Value $false -Initialize -Validation bool -Description 'Whether the account to use for performing the schema update should be removed from the schema admins group after use.'
 Set-PSFConfig -Module 'ForestManagement' -Name 'Schema.Password.AutoReset' -Value $false -Initialize -Validation bool -Description 'Whether the password of the used account should be reset before & after use.'
 Set-PSFConfig -Module 'ForestManagement' -Name 'Schema.Attributes.ReportUnconfigured' -Value $false -Initialize -Validation bool -Description 'Whether Schema attributes that were not configured should be reported as a test finding.'
+
+Set-PSFConfig -Module 'ForestManagement' -Name 'AccessRules.Remove.Option2' -Value $false -Initialize -Validation bool -Description 'In some environments, the default way of removing access rules have proved to not work out. Using this option enables a second way for removing access rules.'
+# Should not use more than 4 for now, until retries are configurable
+Set-PSFConfig -Module 'ForestManagement' -Name 'AccessRules.Threads' -Value 4 -Initialize -Validation integerpositive -Description 'The number of runspaces to use for access rule processing. This is an in-memory operation, using more cores than available is disadviced.'
+# Should be disabled by default, as runspace feature not quite stable yet
+Set-PSFConfig -Module 'ForestManagement' -Name 'AccessRules.Parallelize' -Value $false -Initialize -Validation bool -Description 'Whether to process AccessRules with multiple runspaces (recommended for performance reasons).'
