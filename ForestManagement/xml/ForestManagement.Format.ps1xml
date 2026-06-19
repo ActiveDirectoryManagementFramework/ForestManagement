@@ -4,6 +4,8 @@
         <SelectionSet>
             <Name>ForestManagement.TestResults</Name>
             <Types>
+                <TypeName>ForestManagement.AccessRule.TestResult</TypeName>
+                <TypeName>ForestManagement.Acl.TestResult</TypeName>
                 <TypeName>ForestManagement.Certificate.TestResult</TypeName>
 				<TypeName>ForestManagement.ExchangeSchema.TestResult</TypeName>
 				<TypeName>ForestManagement.ForestLevel.TestResult</TypeName>

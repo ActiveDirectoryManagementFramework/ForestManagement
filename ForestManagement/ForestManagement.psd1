@@ -3,7 +3,7 @@
 	RootModule = 'ForestManagement.psm1'
 	
 	# Version number of this module.
-	ModuleVersion = '1.5.82'
+	ModuleVersion = '1.6.85'
 	
 	# ID used to uniquely identify this module
 	GUID = '7de4379d-17c8-48d3-bd6d-93279aef64bb'
@@ -47,8 +47,11 @@
 	# Functions to export from this module
 	FunctionsToExport = @(
 		'Clear-FMConfiguration'
+		'Get-FMAccessRule'
+		'Get-FMAcl'
 		'Get-FMCallback'
 		'Get-FMCertificate'
+		'Get-FMContentMode'
 		'Get-FMExchangeSchema'
 		'Get-FMForestLevel'
 		'Get-FMNTAuthStore'
@@ -58,6 +61,8 @@
 		'Get-FMSite'
 		'Get-FMSiteLink'
 		'Get-FMSubnet'
+		'Invoke-FMAccessRule'
+		'Invoke-FMAcl'
 		'Invoke-FMCertificate'
 		'Invoke-FMExchangeSchema'
 		'Invoke-FMForestLevel'
@@ -69,6 +74,8 @@
 		'Invoke-FMSite'
 		'Invoke-FMSiteLink'
 		'Invoke-FMSubnet'
+		'Register-FMAccessRule'
+		'Register-FMAcl'
 		'Register-FMCallback'
 		'Register-FMCertificate'
 		'Register-FMExchangeSchema'
@@ -81,6 +88,9 @@
 		'Register-FMSite'
 		'Register-FMSiteLink'
 		'Register-FMSubnet'
+		'Set-FMContentMode'
+		'Test-FMAccessRule'
+		'Test-FMAcl'
 		'Test-FMCertificate'
 		'Test-FMExchangeSchema'
 		'Test-FMForestLevel'
@@ -92,6 +102,8 @@
 		'Test-FMSite'
 		'Test-FMSiteLink'
 		'Test-FMSubnet'
+		'Unregister-FMAccessRule'
+		'Unregister-FMAcl'
 		'Unregister-FMCallback'
 		'Unregister-FMCertificate'
 		'Unregister-FMExchangeSchema'
@@ -106,13 +118,13 @@
 	)
 	
 	# Cmdlets to export from this module
-	# CmdletsToExport = ''
+	CmdletsToExport = @()
 	
 	# Variables to export from this module
 	# VariablesToExport = ''
 	
 	# Aliases to export from this module
-	# AliasesToExport = ''
+	AliasesToExport = @()
 	
 	# List of all modules packaged with this module
 	# ModuleList = @()

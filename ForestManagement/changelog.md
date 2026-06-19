@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## 1.6.85 (2026-06-19)
+
+- New: Component AccessRule - Managed access rules across Configuration and Schema naming context
+- New: Component ACL - Manage owners and inheritance across Configuration and Schema naming context
+- New: Component ContentMode - define management scope across Configuration and Schema naming context
+
 ## 1.5.82 (2025-10-31)
 
 - Upd: General - Use the shared managed remoting feature, allowing configuring session options.
