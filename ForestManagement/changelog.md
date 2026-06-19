@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## 1.6.83 (2026-06-19)
+## 1.6.85 (2026-06-19)
 
 - New: Component AccessRule - Managed access rules across Configuration and Schema naming context
 - New: Component ACL - Manage owners and inheritance across Configuration and Schema naming context
