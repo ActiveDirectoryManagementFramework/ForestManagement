@@ -22,7 +22,25 @@
 	'Invoke-Callback.Invoking'                                    = 'Executing callback: {0}' # $callback.Name
 	'Invoke-Callback.Invoking.Failed'                             = 'Error executing callback: {0}' # $callback.Name
 	'Invoke-Callback.Invoking.Success'                            = 'Successfully executed callback: {0}' # $callback.Name
+
+	'Invoke-FMAcl.MissingADObject'                                = 'The target object could not be found: {0}' # $testItem.Identity
+	'Invoke-FMAcl.NoAccess'                                       = 'Failed to access Acl on {0}' # $testItem.Identity
+	'Invoke-FMAcl.OwnerNotResolved'                               = 'Was unable to resolve the current owner ({1}) of {0}' # $testItem.Identity, $testItem.ADObject.GetOwner([System.Security.Principal.SecurityIdentifier])
+	'Invoke-FMAcl.ShouldManage'                                   = 'The ADObject {0} has no defined ACL state and should either be configured or removed' # $testItem.Identity
+	'Invoke-FMAcl.UpdatingInheritance'                            = 'Updating inheritance - Inheritance Disabled: {0}' # $testItem.Configuration.NoInheritance
+	'Invoke-FMAcl.UpdatingOwner'                                  = 'Granting ownership to {0}' # ($testItem.Configuration.Owner | Resolve-String)
 	
+	'Invoke-FMAccessRule.Access.Failed'                           = 'Failed to access ACL on {0}' # $testItem.Identity
+	'Invoke-FMAccessRule.AccessRule.Create'                       = 'Adding access rule for {0}, granting {1} ({2})' # $changeEntry.Configuration.IdentityReference, $changeEntry.Configuration.ActiveDirectoryRights, $changeEntry.Configuration.AccessControlType
+	'Invoke-FMAccessRule.AccessRule.Creation.Failed'              = 'Failed to create accessrule at {0} for {1}' # $testItem.Identity, $changeEntry.Configuration.IdentityReference
+	'Invoke-FMAccessRule.AccessRule.Remove'                       = 'Removing access rule for {0}, granting {1} ({2}) from {3}' # $changeEntry.ADObject.IdentityReference, $changeEntry.ADObject.ActiveDirectoryRights, $changeEntry.ADObject.AccessControlType, $changeEntry.DistinguishedName
+	'Invoke-FMAccessRule.AccessRule.Remove.Error.Consistency'     = 'Failed to remove access rule from {0}! This may be due to a consistency error. Investigate the object, it may be resolvable via the dsa GUI in the security tab' # $testItem.Identity
+	'Invoke-FMAccessRule.AccessRule.Remove.Failed'                = 'Failed to removing access rule for {0}, granting {1} ({2}) from {3} for unknown reasons (sorry). If this persists, consider enabling the alternative deletion mode through the "Domainmanagement.AccessRules.Remove.Option2" configuration setting.' # $changeEntry.ADObject.IdentityReference, $changeEntry.ADObject.ActiveDirectoryRights, $changeEntry.ADObject.AccessControlType, $changeEntry.DistinguishedName
+	'Invoke-FMAccessRule.AccessRule.Restore'                      = 'Restoring access rule from schema default for {0}, granting {1} ({2})' # $changeEntry.Configuration.IdentityReference, $changeEntry.Configuration.ActiveDirectoryRights, $changeEntry.Configuration.AccessControlType
+	'Invoke-FMAccessRule.ADObject.Missing'                        = 'Cannot process access rules, due to missing AD object: {0}. Please ensure the domain object is created before trying to apply rules to it!' # $testItem.Identity
+	'Invoke-FMAccessRule.Processing.Execute'                      = 'Applying {0} out of {1} intended access rule changes' # ($testItem.Changed.Count - $failedCount), $testItem.Changed.Count
+	'Invoke-FMAccessRule.Processing.Rules'                        = 'Processing {1} access rule changes on {0}' # $testItem.Identity, $testItem.Changed.Count
+
 	'Invoke-FMCertificate.Add'                                    = 'Adding {1} certificate: {0}' # $testResult.Configuration.Certificate.Subject, $testResult.Configuration.Type
 	'Invoke-FMCertificate.Invalid.Input'                          = 'Invalid input - not a valid testresult object returned by Test-FMCertificate: {0}' # $testResult
 	'Invoke-FMCertificate.Remove'                                 = 'Removing certificate {0} from {1}' # $testResult.ADObject.Subject, $testResult.ADObject.ADObject
@@ -105,7 +123,22 @@
 	'Remove-SchemaAdminCredential.TemporaryAccount.Remove'        = 'Removing temporary schema admin account {0}' # $script:temporarySchemaUpdateUser.Name
 	'Remove-SchemaAdminCredential.TemporaryAccount.Remove.Failed' = 'Failed to remove temporary schema admin account {0}' # $script:temporarySchemaUpdateUser.Name
 	
+	'Resolve-ContentSearchBase.Exclude.NotFound'                  = 'Failed to find excluded ou/container: {0}' # $item.Name
+	'Resolve-ContentSearchBase.Include.NotFound'                  = 'Failed to find included ou/container: {0}' # $item.Name
+	'Resolve-ContentSearchBase.Searchbase.Found'                  = 'Resolved searchbase in {2}: {0} | {1}' # $searchBase.SearchScope, $searchBase.SearchBase, $script:domainContext.Fqdn
+	
 	'Resolve-SchemaAttribute.Update.SystemOnlyError'              = 'Cannot update {0} to {1} on {2}. The attribute property is system protected and can only ever be defined when creating a new attribute! This cannot be undone and only replacing the attribute with a new attribute will allow you to resolve the issue.' # $attributeName, $attributes.$attributeName, $ADObject
+	
+	'Set-FMContentMode.Error.UnknownExcludedComponent'            = 'Error excluding a Component from the Forest Content Mode. Unexpected Component: {0}. Ensure the Component specified not only exists, but also supports being excluded from Forest Content Mode.' # $pair.Key
+
+	'Test-FMAccessRule.DefaultPermission.Failed'                  = 'Failed to retrieve default permissions from Schema when connecting to {0}' # $Server
+	'Test-FMAccessRule.NoAccess'                                  = 'Failed to access {0}' # $resolvedPath
+	'Test-FMAccessRule.Parallel.Error'                            = 'Failed to process {0}' # $fail.ADObject
+	
+	'Test-FMAcl.ADObjectNotFound'                                 = 'The target object could not be found: {0}' # $resolvedPath
+	'Test-FMAcl.NoAccess'                                         = 'Failed to access Acl on {0}' # $resolvedPath
+	'Test-FMAcl.ResolveOwner'                                     = 'Resolving acceptable owners via Privileged Group Set {0} for object {1}' # $Category.Owner.Trim('_'),$ADObject.DistinguishedName
+
 	'Test-FMSchema.Connect.Failed'                                = 'Failed to connect to {0}' # $Server
 	
 	'Test-FMSchemaDefaultPermission.Class.IdentityUncertain'      = 'Unable to resolve all identities for the default permissions to apply to {0}. This objectclass will be skipped instead.' # $Configuration[0].ClassName

@@ -91,10 +91,10 @@
 				$basicHash = $AccessRule | ConvertTo-PSFHashtable
 				$basicHash.IdentityResolved = $true
 				$basicHash.Error = $null
-				$basicHash.ObjectTypeGuid = Convert-DMSchemaGuid @Parameters -Name $basicHash.ObjectType -OutType GuidString
-				$basicHash.ObjectTypeName = Convert-DMSchemaGuid @Parameters -Name $basicHash.ObjectType -OutType Name
-				$basicHash.InheritedObjectTypeGuid = Convert-DMSchemaGuid @Parameters -Name $basicHash.InheritedObjectType -OutType GuidString
-				$basicHash.InheritedObjectTypeName = Convert-DMSchemaGuid @Parameters -Name $basicHash.InheritedObjectType -OutType Name
+				$basicHash.ObjectTypeGuid = Convert-AdcSchemaGuid @Parameters -Name $basicHash.ObjectType -OutType GuidString
+				$basicHash.ObjectTypeName = Convert-AdcSchemaGuid @Parameters -Name $basicHash.ObjectType -OutType Name
+				$basicHash.InheritedObjectTypeGuid = Convert-AdcSchemaGuid @Parameters -Name $basicHash.InheritedObjectType -OutType GuidString
+				$basicHash.InheritedObjectTypeName = Convert-AdcSchemaGuid @Parameters -Name $basicHash.InheritedObjectType -OutType Name
 				
 				# Namensauflösung
 				$basicHash.ResolvedIdentity = $AccessRule.Identity | Resolve-String -Mode Lax -ArgumentList $Parameters

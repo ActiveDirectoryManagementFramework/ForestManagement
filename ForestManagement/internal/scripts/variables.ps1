@@ -1,4 +1,15 @@
-﻿# Directory Certificate Stores
+﻿# Configured ACLs
+$script:acls = @{ }
+$script:aclByCategory = @{ }
+$script:aclDefaultOwner = $null
+
+# Configured Access Rules - Based on OU / Path
+$script:accessRules = @{ }
+
+# Configured Access Rules - Based on Object Category
+$script:accessCategoryRules = @{ }
+
+# Directory Certificate Stores
 $script:dsCertificates = @{ }
 $script:dsCertificatesAuthorative = @{ }
 
@@ -32,3 +43,26 @@ $script:schemaDefaultPermissions = @{ }
 
 # Schema Definitions for external LDIF files
 $script:schemaLdif = @{ }
+
+#----------------------------------------------------------------------------#
+#                                Context Data                                #
+#----------------------------------------------------------------------------#
+
+# Content Mode
+$script:contentMode = [PSCustomObject]@{
+	PSTypeName        = 'ForestManagement.Content.Mode'
+	Mode              = 'Additive'
+	Include           = @()
+	Exclude           = @()
+
+	# Note: Also update the help on Set-FMContentMode and on the website Content Mode documentation, when adding new entries here.
+	ExcludeComponents = @{
+		AccessRules = $false
+	}
+}
+$script:contentSearchBases = [PSCustomObject]@{
+	Include = @()
+	Exclude = @()
+	Bases   = @()
+	Server  = ''
+}

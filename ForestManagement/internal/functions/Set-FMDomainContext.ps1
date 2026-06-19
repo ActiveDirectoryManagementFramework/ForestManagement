@@ -60,6 +60,8 @@
 				$forestRootSID = (Get-ADObject @parameters -SearchBase "CN=System,$($domainObject.DistinguishedName)" -SearchScope OneLevel -LDAPFilter "(&(objectClass=trustedDomain)(trustPartner=$($forestObject.RootDomain)))" -Properties securityIdentifier).securityIdentifier.Value
 			}
 		}
+
+		$rootDSE = Get-ADRootDSE @parameters
 		
 		Register-StringMapping -Name '%DomainName%' -Value $domainObject.Name
 		Register-StringMapping -Name '%DomainNetBIOSName%' -Value $domainObject.NetbiosName
@@ -71,5 +73,13 @@
 		Register-StringMapping -Name '%RootDomainDN%' -Value $forestRootDomain.DistinguishedName
 		Register-StringMapping -Name '%RootDomainSID%' -Value $forestRootSID
 		Register-StringMapping -Name '%ForestFqdn%' -Value $forestObject.Name
+		Register-StringMapping -Name '%ConfigurationDN%' -Value $rootDSE.configurationNamingContext
+		Register-StringMapping -Name '%SchemaDN%' -Value $rootDSE.schemaNamingContext
+
+		if ($Credential) {
+			Set-AdcDomainCredential -Domain $domainObject.DNSRoot -Credential $Credential
+			Set-AdcDomainCredential -Domain $domainObject.Name -Credential $Credential
+			Set-AdcDomainCredential -Domain $domainObject.DistinguishedName -Credential $Credential
+		}
 	}
 }
