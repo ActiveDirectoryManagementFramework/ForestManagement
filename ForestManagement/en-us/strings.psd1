@@ -22,6 +22,13 @@
 	'Invoke-Callback.Invoking'                                    = 'Executing callback: {0}' # $callback.Name
 	'Invoke-Callback.Invoking.Failed'                             = 'Error executing callback: {0}' # $callback.Name
 	'Invoke-Callback.Invoking.Success'                            = 'Successfully executed callback: {0}' # $callback.Name
+
+	'Invoke-FMAcl.MissingADObject'                                = 'The target object could not be found: {0}' # $testItem.Identity
+	'Invoke-FMAcl.NoAccess'                                       = 'Failed to access Acl on {0}' # $testItem.Identity
+	'Invoke-FMAcl.OwnerNotResolved'                               = 'Was unable to resolve the current owner ({1}) of {0}' # $testItem.Identity, $testItem.ADObject.GetOwner([System.Security.Principal.SecurityIdentifier])
+	'Invoke-FMAcl.ShouldManage'                                   = 'The ADObject {0} has no defined ACL state and should either be configured or removed' # $testItem.Identity
+	'Invoke-FMAcl.UpdatingInheritance'                            = 'Updating inheritance - Inheritance Disabled: {0}' # $testItem.Configuration.NoInheritance
+	'Invoke-FMAcl.UpdatingOwner'                                  = 'Granting ownership to {0}' # ($testItem.Configuration.Owner | Resolve-String)
 	
 	'Invoke-FMAccessRule.Access.Failed'                           = 'Failed to access ACL on {0}' # $testItem.Identity
 	'Invoke-FMAccessRule.AccessRule.Create'                       = 'Adding access rule for {0}, granting {1} ({2})' # $changeEntry.Configuration.IdentityReference, $changeEntry.Configuration.ActiveDirectoryRights, $changeEntry.Configuration.AccessControlType
@@ -128,6 +135,10 @@
 	'Test-FMAccessRule.NoAccess'                                  = 'Failed to access {0}' # $resolvedPath
 	'Test-FMAccessRule.Parallel.Error'                            = 'Failed to process {0}' # $fail.ADObject
 	
+	'Test-FMAcl.ADObjectNotFound'                                 = 'The target object could not be found: {0}' # $resolvedPath
+	'Test-FMAcl.NoAccess'                                         = 'Failed to access Acl on {0}' # $resolvedPath
+	'Test-FMAcl.ResolveOwner'                                     = 'Resolving acceptable owners via Privileged Group Set {0} for object {1}' # $Category.Owner.Trim('_'),$ADObject.DistinguishedName
+
 	'Test-FMSchema.Connect.Failed'                                = 'Failed to connect to {0}' # $Server
 	
 	'Test-FMSchemaDefaultPermission.Class.IdentityUncertain'      = 'Unable to resolve all identities for the default permissions to apply to {0}. This objectclass will be skipped instead.' # $Configuration[0].ClassName

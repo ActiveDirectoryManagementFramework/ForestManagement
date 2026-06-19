@@ -26,7 +26,7 @@
 	
 	process
 	{
-		($script:accessRules.Values | Write-Output | Where-Object IdentityReference -like $Identity)
-		($script:accessCategoryRules.Values | Write-Output | Where-Object IdentityReference -like $Identity)
+		$($script:accessRules.Values | Where-Object IdentityReference -like $Identity)
+		$($script:accessCategoryRules.Values | Where-Object IdentityReference -like $Identity)
 	}
 }
